@@ -1,0 +1,3 @@
+HELLO CODEEVAL
+This is some text
+let's see how period and other symbols are treated.

@@ -1,4 +1,10 @@
+# Python
 *.py[cod]
+
+# Haskell
+*.hi
+*.o
+*.exe
 
 # C extensions
 *.so

@@ -33,9 +33,6 @@ def fibonacci(n):
         seq.append(sum(seq[-2:]))
     return seq[-1]
 
-
-
-
 if __name__ == '__main__':
     with open(sys.argv[1], "r") as f:
         seq = [int(i) for i in f]

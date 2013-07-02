@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # encode: utf-8
 """
-Description:
+Description
+============
 
 Credits: This problem appeared in the Facebook Hacker Cup 2013 Hackathon.
 
@@ -11,26 +12,29 @@ Given a string s, little Johnny defined the beauty of the string as the sum of t
 
 You're a student writing a report on the youth of this famous hacker. You found the string that Johnny considered most beautiful. What is the maximum possible beauty of this string?
 
-Input sample:
-
+Input sample
+============
 Your program should accept as its first argument a path to a filename. Each line in this file has a sentence. e.g.
 
+```
 ABbCcc
 Good luck in the Facebook Hacker Cup this year!
 Ignore punctuation, please :)
 Sometimes test cases are hard to make up.
 So I just go consult Professor Dalves
+```
 
-Output sample:
-
+Output sample
+==============
 Print out the maximum beauty for the string. e.g.
 
+```
 152
 754
 491
 729
 646
-
+```
 """
 import sys
 import itertools

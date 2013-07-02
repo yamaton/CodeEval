@@ -25,7 +25,7 @@ Sometimes test cases are hard to make up.
 So I just go consult Professor Dalves
 ```
 
-Output sample
+Output 	sample
 --------------
 Print out the maximum beauty for the string. e.g.
 
@@ -38,18 +38,22 @@ Print out the maximum beauty for the string. e.g.
 ```
 -}
 
-
 import System.Environment (getArgs)
-import Data.Char (toLower)
+import Data.List (sort, sortBy, group)
+import Data.Char (toLower, isAlpha)
+import Data.Ord (comparing)
+
+tally :: String -> [(Int, Char)]
+tally s = reverse.sortBy (comparing fst) $ map (\x -> (length x, head x)) groupList
+	where groupList = group $ sort [toLower c | c <- s, isAlpha c]
 
 toBeautifulNumber :: String -> Int
-
-
+toBeautifulNumber s = sum $ zipWith (*) (map fst $ tally s) [26, 25..]
 
 main = do
     args <- getArgs
     let fileName = head args
     contents <- readFile fileName
-    let inputs = map read $ lines contents
-    let outputs = map isBeautiful inputs
+    let inputs = lines contents
+    let outputs = map toBeautifulNumber inputs
     mapM print outputs

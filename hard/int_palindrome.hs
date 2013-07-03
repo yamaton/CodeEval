@@ -1,5 +1,5 @@
 {-
-int_palindrome.py
+int_palindrome.hs
 
 Created: 2013-07-03 by Yamato Matsuoka
 

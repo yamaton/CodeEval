@@ -28,9 +28,11 @@ For the curious: In the third example, the subranges are: [87](0 palindromes), [
 
 import sys
 
+
 def is_palindrome(number):
     s = str(number)
     return s == "".join(reversed(s))
+
 
 def subranges(seq):
     X = len(seq)
@@ -38,35 +40,32 @@ def subranges(seq):
         for j in range(i+1, X+1):
             yield seq[i:j]
 
+
 def getdata(filename):
     with open(filename, "r") as f:
-         return [map(int, row.split()) for row in f if row.rstrip()]
+        return [map(int, row.split()) for row in f if row.rstrip()]
+
 
 def interesting_subseq_number(start, end):
     tflist = [is_palindrome(i) for i in xrange(start, end+1)]
     return len([sub for sub in subranges(tflist) if sum(sub) % 2 == 0])
 
+
 def test():
     data = getdata('./int_palindrome.txt')
     assert data == [[1, 2], [1, 7], [87, 88]]
-    assert is_palindrome(5) == True
-    assert is_palindrome(121) == True
-    assert is_palindrome(122) == False
-    
-    assert [i for i in subranges(range(3))] == [[0], [0,1], [0, 1, 2], [1], [1, 2], [2]]
-    
-    assert interesting_subseq_number(1,1) == 0
-    assert interesting_subseq_number(1,2) == 1
-    assert interesting_subseq_number(1,7) == 12
-    assert interesting_subseq_number(87,88) == 1
-    
+    assert is_palindrome(5) is True
+    assert is_palindrome(121) is True
+    assert is_palindrome(122) is False
+    assert [i for i in subranges(range(3))] == [[0], [0, 1], [0, 1, 2], [1], [1, 2], [2]]
+    assert interesting_subseq_number(1, 1) == 0
+    assert interesting_subseq_number(1, 2) == 1
+    assert interesting_subseq_number(1, 7) == 12
+    assert interesting_subseq_number(87, 88) == 1
     print "passed all tests!"
-
-
 
 if __name__ == '__main__':
     data = getdata(sys.argv[1])
     result = (interesting_subseq_number(start, end) for (start, end) in data)
     for i in result:
         print i
-

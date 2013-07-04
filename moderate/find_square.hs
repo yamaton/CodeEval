@@ -34,7 +34,6 @@ import System.Environment (getArgs)
 import Data.List (sort)
 
 type Point = (Int, Int)
-type Vector = (Int, Int)
 
 boolToString :: Bool -> String
 boolToString True  = "true"

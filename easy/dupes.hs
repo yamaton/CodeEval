@@ -1,9 +1,11 @@
 {-
-dupes.py
+dupes.hs
+
+# Unique Elements
 
 Created by Yamato Matsuoka on 2013-07-02.
 
-# Description
+## Description
 You are given a sorted list of numbers with duplicates. Print out the sorted list with duplicates removed.
 
 ## Input sample
@@ -22,8 +24,7 @@ Print out the sorted list with duplicates removed, one per line. e.g.
 -}
 
 import System.Environment
-import Data.List (nub)
-
+import Data.List (nub, intercalate)
 
 -- modified: http://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
 split :: Char -> String -> [String]
@@ -33,8 +34,7 @@ split c s = case dropWhile (== c) s of
                     where (w, s'') = break (== c) s'
 
 join :: Char -> [String] -> String
-join c ws = foldr1 (\w s -> w ++ c : s) ws
-
+join c s = intercalate (c:[]) s
 
 main = do 
     args <- getArgs

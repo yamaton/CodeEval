@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-untitled.py
+reverse_words.py
 
 Created by Yamato Matsuoka on 2012-07-16.
 

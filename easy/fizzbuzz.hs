@@ -27,6 +27,7 @@ Print out the series 1 through N replacing numbers divisible by 'A' by F, number
 ```
 -}
 import System.Environment (getArgs)
+import Data.List (intercalate)
 
 fizzbuzz :: Int -> Int -> Int -> [String]
 fizzbuzz p q n = map (fizzbuzzHelper p q) [1 .. n]
@@ -39,7 +40,7 @@ fizzbuzzHelper p q i
     | otherwise                        = show i
 
 join :: Char -> [String] -> String
-join c ws = foldr1 (\w s -> w ++ c : s) ws
+join c s = intercalate (c:[]) s
 
 main = do
     args <- getArgs

@@ -31,21 +31,39 @@ true
 -}
 
 import System.Environment (getArgs)
+import Data.List (sort)
+
+type Point = (Int, Int)
+type Vector = (Int, Int)
 
 boolToString :: Bool -> String
 boolToString True  = "true"
 boolToString False = "false"
 
-
-parser :: String -> [(Int, Int)]
+parser :: String -> [Point]
 parser s = read $ '[' : s ++ ']' : []
+
+isSquare :: [Point] -> Bool
+isSquare xs = all (== (minimum dists)) $ take 4 (sort dists)
+                where [p1, p2, p3, p4] = xs
+                      d1 = distanceSquared p1 p2
+                      d2 = distanceSquared p3 p4 
+                      d3 = distanceSquared p1 p3
+                      d4 = distanceSquared p2 p4
+                      d5 = distanceSquared p1 p4
+                      d6 = distanceSquared p2 p3
+                      dists = [d1, d2, d3, d4, d5, d6]
+
+distanceSquared :: Point -> Point -> Int
+distanceSquared (x1, y1) (x2, y2) = (x1 - x2)^2 + (y1 - y2)^2
 
 main = do 
     args <- getArgs
     let filename = head args
     contents <- readFile filename
     let inputs = map parser $ lines contents
-    mapM print inputs
+    let outputs = map (boolToString . isSquare) inputs
+    mapM putStrLn outputs
 
 
 

@@ -1,7 +1,7 @@
 {-
 largest_sum.hs
 
-Created by Yamato Matsuoka on 2012-07-05.
+Created by Yamato Matsuoka on 2013-07-05.
 
 Description
 ------------
@@ -27,28 +27,20 @@ Print to stdout, the largest sum. In other words, of all the possible contiguous
 
 import System.Environment (getArgs)
 
-
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
     "" -> []
     s' -> w : split c s'' where (w, s'') = break (== c) s'
 
-
-
-def contiguous_sum_max(lis):
-    idx_max = len(lis)
-    candid = []
-    for i in range(idx_max):
-        for j in range(i+1, idx_max+1):
-            candid.append(sum(lis[i:j]))
-    return max(candid)
-
+contiguousMaxSum :: [Int] -> Int
+contiguousMaxSum xs = maximum $ map sum [drop i (take j xs) | j <- [1 .. len], i <- [0 .. (j-1)]] 
+    where len = length xs
 
 main = do 
     args <- getArgs
-    contents <- readfile (head args)
+    contents <- readFile (head args)
     let inputs = [map read (split ',' line) | line <- lines contents]
-    let outputs = map contiguousSumMax inputs
+    let outputs = map contiguousMaxSum inputs
     mapM print outputs
 
 

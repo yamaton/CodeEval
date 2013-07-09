@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+Created by Yamato Matsuoka on 2013-07-08
+
+Challenge Description
+-----------------------
+You have JSON string which describes a menu. Calculate the SUM of IDs of all "items" in case a "label" exists for an item.
+
+Input sample
+-------------
+Your program should accept as its first argument a path to a filename. Input example is the following
+```
+{"menu": {"header": "menu", "items": [{"id": 27}, {"id": 0, "label": "Label 0"}, null, {"id": 93}, {"id": 85}, {"id": 54}, null, {"id": 46, "label": "Label 46"}]}}
+
+{"menu": {"header": "menu", "items": [{"id": 81}]}}
+
+{"menu": {"header": "menu", "items": [{"id": 70, "label": "Label 70"}, {"id": 85, "label": "Label 85"}, {"id": 93, "label": "Label 93"}, {"id": 2}]}}
+```
+All IDs are integers between 0 and 100. It can be 10 items maximum for a menu.
+
+Output sample
+--------------
+Print results in the following way.
+```
+46
+0
+248
+"""
+
+import sys
+import json
+
+
+def sum_ids_with_label(s):
+    x = json.loads(s)
+    lis = x.get('menu').get('items')
+    lis = [d for d in lis if d is not None]
+    return sum(k.get('id') for k in lis if 'label' in k )
+
+
+if __name__ == '__main__':
+    with open(sys.argv[1], "r") as f:
+        inputs = [line.rstrip() for line in f if line.rstrip()]
+
+    outputs = [sum_ids_with_label(s) for s in inputs]
+
+    for n in outputs:
+        print n

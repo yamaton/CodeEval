@@ -33,7 +33,7 @@ sieve :: Int -> [Int]
 sieve n 
     | n < 2     = []
     | otherwise = 
-        let maxP = round $ sqrt (fromIntegral n)
+        where maxP = round $ sqrt (fromIntegral n)
             numbers = 
 
 primePi :: Int -> Int

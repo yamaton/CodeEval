@@ -28,7 +28,7 @@ import System.Environment (getArgs)
 import Numeric (readHex)
 
 hexToDec :: String -> Int
-hexToDec s = fst.head $ readHex s
+hexToDec s = (fst . head) readHex s
 
 main = do
     args <- getArgs

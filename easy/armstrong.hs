@@ -41,9 +41,8 @@ isArmstrong n =
         where digits = integerDigits n
 
 main = do
-    args <- getArgs
-    let fileName = head args
-    contents <- readFile fileName
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map read $ lines contents
     let outputs = map isArmstrong inputs
     mapM print outputs

@@ -29,7 +29,6 @@ Print results in the following way.
 -}
 import System.Environment (getArgs)
 
-
 sumIDsWithLabel 
 
 main = do 

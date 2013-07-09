@@ -51,8 +51,8 @@ import System.Environment (getArgs)
 data Command = SetCol | SetRow | QueryCol | QueryRow deriving (Read, Show)
 
 parser :: String -> (Command, [Int])
-parser s = (read (head ws), map read (tail ws))
-             where ws = words s
+parser s = (read w, map read ws)
+             where w:ws = words s
 
 main = do 
     args <- getArgs

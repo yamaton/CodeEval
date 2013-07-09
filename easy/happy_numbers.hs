@@ -1,5 +1,5 @@
 {-
-happy_numbers.py
+happy_numbers.hs
 
 Created by Yamato Matsuoka on 2012-07-03.
 
@@ -37,14 +37,13 @@ toIntDigits n = map (`mod` 10) tmp
 digitSquareSum :: Int -> Int
 digitSquareSum n = sum $ map (^2) (toIntDigits n)
 
-isHappyNumberHelper :: Int -> [Int] -> Int
-isHappyNumberHelper 1 _ = 1
-isHappyNumberHelper n xs
-    | n `elem` xs = 0
-    | otherwise = isHappyNumberHelper (digitSquareSum n) (n:xs)
-
 isHappyNumber :: Int -> Int
-isHappyNumber n = isHappyNumberHelper n []
+isHappyNumber n = helper n []
+                  where
+                    helper 1 _ = 1
+                    helper x xs
+                      | x `elem` xs = 0
+                      | otherwise   = helper (digitSquareSum x) (x:xs)
 
 main = do
     args <- getArgs

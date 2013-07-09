@@ -1,4 +1,4 @@
-"""
+{-
 Climbing Stairs
 ===============
 Description
@@ -20,22 +20,27 @@ Print out the number of ways to climb to the top of the staircase. e.g.
 89
 10946
 ```
-"""
-import sys
+-}
+import System.Environment (getArgs)
+import Control.Monad (forM)
+import Control.Monad.State (evalState, get, put)
+
+fibonacci :: Int -> Int
+fibonacci n = flip evalState (0,1) $ do
+  forM [0 .. (n-1)] $ \_ -> do
+    (a, b) <- get
+    put (b, a + b)
+  (a, b) <- get
+  return a
+
+numberOfWays :: Int -> Int
+numberOfWays n = fibonacci (n+1)
 
 
-def fibonacci(n):
-    seq = [0, 1]
-    for i in range(2, n + 1):
-        seq.append(sum(seq[-2:]))
-    return seq[-1]
+main = do 
+  args <- getArgs
+  contents <- readFile (head args)
+  let inputs = map read $ lines contents
+  let outputs = map numberOfWays inputs
+  mapM print outputs
 
-
-def number_of_ways(n):
-    return fibonacci(n+1)
-
-if __name__ == '__main__':
-    with open(sys.argv[1], 'r') as f:
-        data = [int(x) for x in f]
-    for n in data:
-        print number_of_ways(n)

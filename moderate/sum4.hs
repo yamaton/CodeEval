@@ -32,18 +32,24 @@ split c s = case dropWhile (== c) s of
                     where (w, s'') = break (== c) s'
 
 
--- http://www.haskell.org/pipermail/beginners/2011-November/008990.html
 combinations :: Int -> [a] -> [[a]]
-combinations 0 _ = [[]]
 combinations _ [] = []
-combinations n (x:xs) = [x:comb | comb <- combinations (n-1) xs]
-                         ++ combinations n xs
-
+combinations n xs  
+  | n < 0     = []
+  | n == 0    = [[]]  
+  | n == 1    = map (:[]) xs 
+  | otherwise = helper n (length xs) xs    
+    where
+      helper k l ys@(z:zs)        
+        | k < l     = [z:ws | ws <- combinations (k-1) zs]
+                         ++ combinations k zs        
+        | k == l    = [ys]        
+        | otherwise = []
 
 
 
 countSum:: Int -> [Int] -> Int
-countSum n xs = 
+countSum n xs = length $ filter (\xs -> sum xs == 0) (combinations n xs)
 
 main = do 
     args <- getArgs

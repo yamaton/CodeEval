@@ -3,11 +3,14 @@ sum_prime.hs
 
 Created by Yamato Matsuoka on 2013-07-03.
 
-Description: Write a program to determine the sum of the first 1000 prime numbers.
+## Description
+Write a program to determine the sum of the first 1000 prime numbers.
 
-Input sample: None
+## Input sample
+None
 
-Output sample:  Your program should print the sum on stdout.i.e.
+##Output sample
+Your program should print the sum on stdout.i.e.
 
 -}
 
@@ -25,5 +28,5 @@ primes n
     | otherwise = [2, 3, 5, 7, 11] !! n
 
 main = do 
-    print (sum $ take 1000 $ primes)
+    print $ sum (take 1000 primes)
 

@@ -38,8 +38,8 @@ numberOfWays n = fibonacci (n+1)
 
 
 main = do 
-  args <- getArgs
-  contents <- readFile (head args)
+  f:_ <- getArgs
+  contents <- readFile f
   let inputs = map read $ lines contents
   let outputs = map numberOfWays inputs
   mapM print outputs

@@ -1,4 +1,4 @@
-CodeEval
-========
+CodeEval Solutions
+===================
 
-Solutions to CodeEval challenges
+Solutions for [CodeEval](https://www.codeeval.com/open_challenges/) challenges.

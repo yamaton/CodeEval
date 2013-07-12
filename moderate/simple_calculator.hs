@@ -2,8 +2,7 @@
 simple_calculator.hs
 
 Challenge Description
-======================
-
+----------------------
 The goal of this challenge is to create a simple calculator. 
 The following operations should be supported with their order (operator precedence):
 ```
@@ -15,7 +14,6 @@ The following operations should be supported with their order (operator preceden
 ```
 
 ## Input sample
-
 Your program should accept as its first argument a path to a filename. The input file contains several lines. Each line is one test case. Each line contains mathematical expression. eg.
 ```
 250*14.3
@@ -24,8 +22,7 @@ Your program should accept as its first argument a path to a filename. The input
 (59 - 15 + 3*6)/21
 ```
 
-## Output sample:
-
+## Output sample
 For each set of input produce a single line of output which is the result of calculation.
 ```
 3575
@@ -36,7 +33,7 @@ For each set of input produce a single line of output which is the result of cal
 
 Note: Don't use any kind of eval function.
 
-Constraints: 
+## Constraints 
 Each number in input expression is greater than -20,000 and less than 20,000. 
 Each output number is greater than -20,000 and less than 20,000. 
 If output number is a float number it should be rounded to the 5th digit after the dot. 

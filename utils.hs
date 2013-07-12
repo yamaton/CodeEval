@@ -3,37 +3,40 @@
 import Data.Char (intToDigit)
 import Numeric (showIntAtBase)
 import Data.List (intercalate)
-import Control.Monad (forM)
+import Control.Monad (forM, replicateM)
 import Control.Monad.State (evalState, get, put)
 import Data.Map (fromListWith, toList)
 
 
---| split string with char 
+-- split string with char 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
               "" -> []
               s' -> w : split c s''
                 where (w, s'') = break (== c) s'
 
---| join strings with char
-join :: Char -> [String] -> String
-join c s = intercalate (c:[]) s
+-- join elements in [String] by putting String in between them
+join :: String -> [String] -> String
+join = intercalate
 
 
---| combinations
+-- combinations
 combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
 combinations _ [] = []
 combinations n xs  
-  | n < 0     = []
-  | n == 0    = [[]]  
   | n == 1    = map (:[]) xs 
   | otherwise = helper n (length xs) xs    
     where
       helper k l ys@(z:zs)        
-        | k < l     = [z:ws | ws <- combinations (k-1) zs]
-                         ++ combinations k zs        
-        | k == l    = [ys]        
+        | k < l     = map (z :) (combinations (k-1) zs)
+                         ++ combinations k zs
+        | k == l    = [ys]
         | otherwise = []
+
+
+-- Equivalent to `combinations_with_relacement` in itertools of Python.
+combinationsWithReplacement :: (Eq a) => Int -> [a] -> [[a]]
 
 
 --| frequency (occurrence) of element
@@ -43,8 +46,9 @@ tally xs = toList $ fromListWith (+) [(x, 1)| x <- xs]
 
 
 --| Cartesian product
-cartProd :: [a] -> [b] -> [(a, b)]
-cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+-- Tuples in Mathematica
+cartProd :: Int -> [a] -> [[a]]
+cartProd = replicateM
 
 
 --| Fibonacci number

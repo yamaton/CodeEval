@@ -29,12 +29,12 @@ For each line of input, print out the prime numbers less than N, in ascending or
 import System.Environment (getArgs)
 import Data.List (intercalate)
 
-join :: Chqr -> [String] -> String
-join c xs = intercalate (c:[]) xs
+sieve :: Int -> [Int]
+sieve n = 
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map read $ lines contents
-    let outputs = map primesLessThen inputs
-    mapM putStrLn $ [(join ',') (map read out) | out <- outputs]
+    let outputs = map sieve inputs
+    mapM putStrLn $ [(intercalate ",") (map read out) | out <- outputs]

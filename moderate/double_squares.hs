@@ -52,30 +52,6 @@ def EratosthenesSieve(N):
 
 
 
-def factorinteger(n):
-    """Simple trial method"""
-    def tally(lis):
-        d = {}
-        for i in lis:
-            if d.has_key(i):
-                d[i] += 1
-            else:
-                d[i] = 1
-        out = d.items()
-        return out
-    
-    if n == 0: return [(0,1)]
-    if n == 1: return [(1,1)]
-    primes = EratosthenesSieve(int(n**0.5))
-    prime_factors = []
-    for p in primes:
-        if p*p > n: break
-        while n % p == 0:
-            n /= p
-            prime_factors.append(p)
-    if n > 1: prime_factors.append(n)
-    return tally(prime_factors)
-
 
 def divisors(n):
     if n == 0: return None

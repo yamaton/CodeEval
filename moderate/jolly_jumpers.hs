@@ -16,32 +16,29 @@ is a jolly jumper, because the absolute differences are 3, 2, and 1, respectivel
 Input sample
 -------------
 Your program should accept as its first argument a path to a filename. Each line in this file is one test case. Each test case will contain an integer n < 3000 followed by n integers representing the sequence. The integers are space delimited.
-```
-4 1 4 2 3
-5 1 4 2 -1 6
-```
 
 Output sample
 --------------
 For each line of input generate a line of output saying 'Jolly' or 'Not jolly'.
-```
-Jolly
-Not jolly
-```
 -}
 
 import System.Environment (getArgs)
+import Data.List (sort)
 
-def is_jolly_jumber(seq):
-    n = len(seq)
-    if n == 1:
-        return True
-    else:
-        return range(1,n) == sorted(abs(seq[i+1]-seq[i]) for i in range(n-1))
-
+isJolly :: [Int] -> Bool
+isJolly xs
+    | n == 1    = True
+    | otherwise = [1 .. (n-1)] == (sort $ map abs $ zipWith (-) (tail xs) (init xs))
+        where n = length xs
 
 boolToJolly :: Bool -> String
 boolToJolly True = "Jolly"
 boolToJolly False = "Not jolly"
 
+main = do 
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = [map read $ tail (words line) | line <- lines contents]
+    let outputs = map (boolToJolly . isJolly) inputs
+    mapM putStrLn outputs
 

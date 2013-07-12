@@ -27,21 +27,13 @@ hllo worl
 
 import System.Environment (getArgs)
 
-split :: Char -> String -> [String]
-split c s = case dropWhile (== c) s of
-    "" -> []
-    s' -> w : s'' where (w, s'') = break (== c) s'
+reader :: String -> (String, String)
+reader s = (former, drop 2 latter)
+    where (former, latter) = break (== ',') s
 
-
-def remove_chars(entry):
-    text, chars = entry
-    return "".join(c for c in text if c not in chars)
-
-if __name__ == '__main__':
-    with open(sys.argv[1], "r") as f:
-        data = [[s.strip() for s in line.rstrip().split(",")] for line in f]
-    
-    out = (remove_chars(entry) for entry in data)
-    print "\n".join(out)
-
-
+main = do 
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = map reader $ lines contents
+    let outputs = [ filter (\c -> c `notElem` s) text | (text, s) <- inputs]
+    mapM putStrLn outputs

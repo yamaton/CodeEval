@@ -1,7 +1,7 @@
 {-
 endian.hs
 
-Created by Yamato Matsuoka on 2013-07-14.
+Created by Yamato Matsuoka on 2013-07-12.
 
 Description
 ------------
@@ -17,17 +17,26 @@ Print to stdout, the endianness, wheather it is LittleEndian or BigEndian. e.g.
 ```
 BigEndian
 ```
+
+[Comment] https://github.com/peti/hsdns/blob/master/ADNS/Endian.hs
 -}
+import Foreign
+import System.IO.Unsafe
 
-import System.Environment (getArgs)
+data Endian = LittleEndian | BigEndian deriving (Show, Eq)
 
-def endian():
-    x = sys.byteorder
-    if x == "little":
-        return "LittleEndian"
-    else:
-        return "BigEndian"
+endian :: Endian
+endian = 
+    System.IO.Unsafe.unsafePerformIO $
+      allocaArray (sizeOf (undefined :: Word32)) $ \p -> do
+        let val = 0x01020304 :: Word32
+        poke p val
+        let p' = castPtr p :: Ptr Word8
+        val' <- peekArray 4 p'
+        case val' of         
+            (0x01:0x02:0x03:0x04:[]) -> return BigEndian
+            (0x04:0x03:0x02:0x01:[]) -> return LittleEndian
+            _                        -> error "unknown endian"
 
-if __name__ == '__main__':
-	print endian()
-
+main = do
+	print endian

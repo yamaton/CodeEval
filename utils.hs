@@ -39,13 +39,13 @@ combinations n xs
 combinationsWithReplacement :: (Eq a) => Int -> [a] -> [[a]]
 
 
---| frequency (occurrence) of element
+-- frequency (occurrence) of element
 -- http://stackoverflow.com/questions/7108559/how-to-find-the-frequency-of-characters-in-a-string-in-haskell
 tally :: (Ord a) => [a] -> [(a, Int)]
 tally xs = toList $ fromListWith (+) [(x, 1)| x <- xs]
 
 
---| Cartesian product
+-- Cartesian product
 -- Tuples in Mathematica
 cartProd :: Int -> [a] -> [[a]]
 cartProd = replicateM
@@ -76,6 +76,11 @@ fromDigits xs = foldl1 (\i j -> 10 * i + j) xs
 fromDigits' :: [Int] -> Int
 fromDigits' xs = read $ concatMap show xs
 
+
+factorInteger :: Int -> [Int]
+
+
+divisors :: Int -> [Int]
 
 --| check if integer is palindrome
 isPalindrome :: Int -> Bool

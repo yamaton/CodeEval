@@ -42,21 +42,42 @@ YES
 NO
 ```
 
-[LOG]
-    - v0.03  [UNDONE] translated Python code to Haskell
 -}
 
 import System.Environment (getArgs)
+import Data.List (isInfixOf)
 
-isBalancedSmiley :: String -> Bool
+isBalanced :: String -> Bool
+isBalanced "" = True
+isBalanced s
+  | any (`notElem` allowed) s = False
+  | isParenthesisClosed s     = True
+  | otherwise                 = 
+      if isInfixOf ":)"
+
+    where allowed = ['a' .. 'z'] ++ "(): "
+          regex   = mkRegex ":\)|:\("
+          
+
+
+isParenthesisClosed :: String -> Bool
+isParenthesisClosed s = (all (>= 0) stack) && (last stack == 0)
+  where 
+    stack = scanl helper 0 s :: [Int]
+      where 
+        helper :: Int -> Char -> Int
+        helper acc '(' = acc + 1
+        helper acc ')' = acc - 1
+        helper acc _   = acc
 
 boolToYesNo :: Bool -> String
 boolToYesNo True  = "YES"
 boolToYesNo False = "NO"
 
-main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let input = lines contents
-    let output = map (boolToYesNo . )
+--main = do 
+--  args <- getArgs
+--  let filename = head args
+--  contents <- readFile filename
+--  let inputs = lines contents
+--  let outputs = map (boolToYesNo . isBalanced) inputs
+--  mapM putStrLn outputs

@@ -2,7 +2,7 @@
 # encoding: utf-8
 """
 Da Vyncy
-
+=========
 Description
 -----------
 You were reading The Da Vyncy Code, the translation of a famous murder mystery novel into Python. The Code is finally revealed on the last page. You had reached the second to last page of the novel, and then you went to take a bathroom break.
@@ -14,8 +14,7 @@ The last page of your book is now in tatters.
 However, there are many text fragments floating in the air. You enlist an undergraduate student for a 'summer research project' of typing up these fragments into a file. Your mission: reassemble the last page of your book.
 
 Problem Description
-====================
-
+--------------------
 (adapted from a problem by Julie Zelenski)
 
 Write a program that, given a set of fragments (ASCII strings), uses the following method (or a method producing identical output) to reassemble the document from which they came:

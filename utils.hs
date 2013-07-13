@@ -112,3 +112,8 @@ hexToInt s = (fst . head) readHex s
 count :: (Eq a) => a -> [a] -> Int
 count x = length . filter (== x)
 
+
+takeEvery :: Int -> [a] -> [a]
+takeEvery n xs = case drop (n - 1) xs of
+    []     -> []
+    (y:ys) -> y : takeEvery n ys 

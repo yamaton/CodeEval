@@ -14,8 +14,10 @@ Print out the plaintext message. (in CAPS)
 
 import string
 
+
 def int2chr(n, k=0):
     return chr((n-k) + ord('A'))
+
 
 def split_every_two(s, n=2):
     """Split string into every n letters"""
@@ -27,12 +29,11 @@ if __name__ == '__main__':
     key = "BHISOECRTMGWYVALUZDNFJKPQX"
     table1 = string.maketrans(key, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     table2 = string.maketrans("ABCDEFGHIJKLMNOPQRSTUVWXYZ", key)
-    
+
     message = [split_every_two(s) for s in message]
     # print message
     message = ["".join(map(int2chr, s)) for s in message]
     # print message
-    
+
     print " ".join(m.translate(table1) for m in message)
-    # print [m.translate(table2) for m in message]    
-    
+    # print " ".join(m.translate(table2) for m in message)

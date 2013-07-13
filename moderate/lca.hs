@@ -41,11 +41,13 @@ Print to stdout, the least common ancestor, one per line. e.g.
 
 import System.Environment (getArgs)
 
+lowestCommonAncestor :: Int -> Int -> Int
+lowestCommonAncestor p q = 
 
 main = do 
     args <- getArgs
     contents <- readFile (head args)
     let inputs = [map read (words line) | line <- lines contents]
-    let outputs = [leastCommonAncestor p q | [p, q] <- inputs]
+    let outputs = [lowestCommonAncestor p q | [p, q] <- inputs]
     mapM print outputs
 

@@ -42,10 +42,15 @@ def if_valid_parenthesis(s):
                 return False
     return len(stack) == 0
 
+isValidParenthesis :: String -> Bool
 
-if __name__ == '__main__':
-    with open(sys.argv[1], 'r') as f:
-        data = [s.rstrip() for s in f]
 
-    for s in data:
-        print if_valid_parenthesis(s)
+
+
+main = do 
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = lines contents
+    let outputs = map isValidParenthesis inputs
+    mapM print outputs
+

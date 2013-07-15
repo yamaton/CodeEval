@@ -53,53 +53,32 @@ Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, ad
 -}
 
 import System.Environment (getArgs)
-import Data.List (isInfixOf)
+import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
 import GHC.Exts (sortWith)
 
-overlap :: [String] -> Int
+overlap :: String -> String -> Int
 overlap s1 s2 = 
-  | isInfixOf ss tt = length ss
-  | otherwise       =
+  | isInfixOf sm lg = length sm
+  | otherwise       = max (helper isInfixOf tail sm lg) (helper isSuffixOf init sm lg)
+    where
+    [sm, lg] = sortWith length [s1, s2]
+    helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> Int
+    helper f next xs ys = if (f (next xs) ys) then (length ys ) else (helper f (next xs) ys)
 
 
-  where
-    [ss, tt] = sortWith length [s1, s2]
+merge :: String -> String -> String
+merge s1 s2 = 
+  | isInfixOf sm lg = lg
+  | otherwise       = sortWith length (helper isInfixOf tail sm lg) (helper isSuffixOf init sm lg)
+    where
+    [sm, lg] = sortWith length [s1, s2]
+    helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> [a]
+    helper f next xs ys = if (f xs ys) then (length xs) else (helper f (next xs) ys)
 
 
-
-def overlap(x):
-    s = min(x, key=len)
-    t = max(x, key=len)
-
-    if s in t:
-        return len(s)
-
-    out = 0
-    for i in range(1, len(s)):
-        if s[-i:] == t[:i] or t[-i:] == s[:i]:
-            out = i
-    return out
-
-
-def merge(x):
-    s = min(x, key=len)
-    t = max(x, key=len)
-
-    if s in t:
-        return t
-
-    len1 = len2 = 0
-    for i in range(1, len(s)):
-        if s[-i:] == t[:i]:
-            len1 = i
-        if t[-i:] == s[:i]:
-            len2 = i
-
-    if len1 > len2:
-        return s + t[len1:]
-    else:
-        return t + s[len2:]
-
+putTogetherOnce :: [String] -> [String]
+putTogetherOnce
+  where pair =     
 
 def da_vyncy(frags):
     while len(frags) > 1:

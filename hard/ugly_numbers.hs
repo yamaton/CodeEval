@@ -120,6 +120,14 @@ def _count_ugly(seq):
 def count_ugly_numbers(seq):
     return sum(_count_ugly(s) for s in concat_combinations(seq))
 
+genNumbers :: Int -> [Int]
+genNumbers n = foldl (concatMap (\acc n ->  [10 * acc + n, acc + n, acc - n]) [x] xs
+    where (x:xs) = integerDigits n
+
+integerDigits :: Int -> [Int]
+integerDigits n = map (read . (:[])) (show n)
+
+
 countUgly :: String -> Int
 countUgly s = length $ filter isUgly (genNumbers s)
 

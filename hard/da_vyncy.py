@@ -94,10 +94,10 @@ def merge(x):
 
 def da_vyncy(frags):
     while len(frags) > 1:
-        x = max((x for x in itertools.combinations(frags, 2)), key=overlap)
+        pair = max((x for x in itertools.combinations(frags, 2)), key=overlap)
         for i in x:
             frags.remove(i)
-        frags.add(merge(x))
+        frags.add(merge(pair))
     return frags.pop()
 
 

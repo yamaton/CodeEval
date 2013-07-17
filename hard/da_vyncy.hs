@@ -44,57 +44,75 @@ O draconian devil! Oh lame saint!
 Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
 ```
 
-[LOG]
-    ver 0.2  ...  now fragments are treated as a set rather than a list. Got 100%.
-    ver 0.1  ...  created. Got 2/3 problems right in CodeEval. 
-
 [Comment]
     This code has lots of duplicates and rooms for performance improvements.
 -}
 
 import System.Environment (getArgs)
-import Data.List (isInfixOf, isPrefixOf, isSuffixOf)
+import Data.List (isInfixOf, isPrefixOf, isSuffixOf, delete)
 import GHC.Exts (sortWith)
 
-overlap :: String -> String -> Int
-overlap s1 s2 = 
+split :: Char -> String -> [String]
+split c s = 
+  case dropWhile (== c) s of
+    "" -> []
+    s' -> w : split c s''
+      where (w, s'') = break (== c) s'
+
+
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
+combinations _ [] = []
+combinations n xs  
+  | n == 1    = map (:[]) xs 
+  | otherwise = helper n (length xs) xs    
+    where
+      helper k l ys@(z:zs)        
+        | k < l     = map (z :) (combinations (k-1) zs)
+                         ++ combinations k zs
+        | k == l    = [ys]
+        | otherwise = []
+
+
+
+overlapLength :: [String] -> Int
+overlapLength ss
   | isInfixOf sm lg = length sm
   | otherwise       = max (helper isInfixOf tail sm lg) (helper isSuffixOf init sm lg)
     where
-    [sm, lg] = sortWith length [s1, s2]
-    helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> Int
-    helper f next xs ys = if (f (next xs) ys) then (length ys ) else (helper f (next xs) ys)
+      [sm, lg] = sortWith length ss
+      helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> Int
+      helper f next xs ys = if (f (next xs) ys) then (length xs - 1) else (helper f next (next xs) ys)
 
 
 merge :: String -> String -> String
-merge s1 s2 = 
+merge s1 s2 
   | isInfixOf sm lg = lg
-  | otherwise       = sortWith length (helper isInfixOf tail sm lg) (helper isSuffixOf init sm lg)
+  | otherwise       = head $ sortWith length [helperMergeP sm lg,  helperMergeS sm lg]
     where
-    [sm, lg] = sortWith length [s1, s2]
-    helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> [a]
-    helper f next xs ys = if (f xs ys) then (length xs) else (helper f (next xs) ys)
-
-
-putTogetherOnce :: [String] -> [String]
-putTogetherOnce
-  where pair =     
-
-def da_vyncy(frags):
-    while len(frags) > 1:
-        x = max((x for x in itertools.combinations(frags, 2)), key=overlap)
-        for i in x:
-            frags.remove(i)
-        frags.add(merge(x))
-    return frags.pop()
+      [sm, lg] = sortWith length [s1, s2]
+      helperP xxs xs ys = if (isPrefixOf xs ys) 
+                            then (take (length xxs - length xs) xxs) ++ ys 
+                            else (helperP xxs (tail xs) ys)
+      helperS xxs xs ys = if (isSuffixOf xs ys)
+                            then ys ++ (drop (length xs) xxs)
+                            else (helperS xxs (init xs) ys)
+      helperMergeP xs ys = helperP xs (tail xs) ys       
+      helperMergeS xs ys = helperS xs (init xs) ys                        
 
 
 daVyncy :: [String] -> String
+daVyncy [x] = x
 daVyncy xs = 
+  daVyncy $ (merge s1 s2) : (foldl (flip delete) xs [s1, s2])
+    where [s1, s2] = last $ sortWith overlapLength $ combinations 2 xs
+
+reader :: String -> [String]
+reader s = split ';' s
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = map reader $ lines contents
     let outputs = map daVyncy inputs
-    mapM putStrLn outputs
+    mapM_ putStrLn outputs

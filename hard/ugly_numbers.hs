@@ -50,109 +50,45 @@ Print out the number of expressions that evaluate to an ugly number for each tes
 -}
 
 import System.Environment (getArgs)
+import Control.Monad (replicateM, ap)
 
-def roundrobin(*iterables):
-    """
-    roundrobin('ABC', 'D', 'EF') --> A D E B F C
-    
-    ** From itertools recipes **
-    http://docs.python.org/library/itertools.html
-    """
-    cycle = itertools.cycle
-    islice = itertools.islice
-    
-    # Recipe credited to George Sakkis
-    pending = len(iterables)
-    nexts = cycle(iter(it).next for it in iterables)
-    while pending:
-        try:
-            for next in nexts:
-                yield next()
-        except StopIteration:
-            pending -= 1
-            nexts = cycle(islice(nexts, pending))
+-- |
+-- >>> genNumbers [1,2,3]
+-- [6,2,0,-4]
+genNumbers :: [Int] -> [Int]
+genNumbers []     = []
+genNumbers (x:xs) = 
+  foldl (\acc n -> ap [(+n), \i -> i-n] acc) [x] xs
 
+-- |
+-- >>> concatComb "abc"
+-- [["abc"],["ab","c"],["a","bc"],["a","b","c"]]
+concatComb :: String -> [[String]]
+concatComb s = foldr helper [[""]] s
+  where 
+      helper :: Char -> [[String]] -> [[String]]
+      helper c [[""]] = [[[c]]]
+      helper c xxs = ap [(f c), (g c)] xxs
+      f c (ss:yss) = (c:ss) : yss
+      g c yss = [c] : yss
 
-def tuples(iterable, n):
-    """
-    Gives a generator of all possible n-tuples of elements from list lis
-    """
-    return itertools.product(*(itertools.repeat(iterable, n)))
-
-
-
-isUgly Int -> Bool
-isUgly n
-    | n < 0     = True
-    | otherwise = any (\p -> n `mod` p == 0) [2, 3, 5, 7] 
-
-
-def concat_combinations(string_seq):
-    """
-    Return integer list as a generator.
-    
-    concat_combinations("123")
-    ==> ([123], [12, 3], [1, 23], [1, 2, 3])
-    """
-    n = len(string_seq)
-    for seps in tuples(["", " "], n-1):
-        tmp = "".join(roundrobin(string_seq, seps)).split()
-        yield [int(i) for i in tmp]
-
-
-def _count_ugly(seq):
-    """
-    use prefix notation to evaluate.
-    """
-    N = len(seq)
-    result = []
-    for operators in tuples((op.add, op.sub), N-1):
-        ## Deque is faster than list given by "stack = s[:]"
-        stack = collections.deque(sq) 
-        for f in operators:
-            x1 = stack.pop()
-            x2 = stack.pop()
-            stack.append(f(x1, x2))
-        result.append(stack[0])
-    return sum(is_ugly(i) for i in result)
-
-
-def count_ugly_numbers(seq):
-    return sum(_count_ugly(s) for s in concat_combinations(seq))
-
-genNumbers :: Int -> [Int]
-genNumbers n = foldl (concatMap (\acc n ->  [10 * acc + n, acc + n, acc - n]) [x] xs
-    where (x:xs) = integerDigits n
-
-integerDigits :: Int -> [Int]
-integerDigits n = map (read . (:[])) (show n)
-
+-- |
+-- >>> strToNumber [["123"], ["12", "3"], ["1", "23"], ["1", "2", "3"]]
+-- [[123], [12,3], [1,23], [1,2,3]]
+strToNum :: [[String]] -> [[Int]]
+strToNumber xxs = [map read xs | xs <- xxs]
 
 countUgly :: String -> Int
-countUgly s = length $ filter isUgly (genNumbers s)
+countUgly s = length $ filter isUgly $ concatMap genNumbers $ (strToNum . concatComb) s
 
---def test():
---    assert list(roundrobin('abc','def', 'g', 'hi')) == ['a', 'd', 'g', 'h', 'b', 'e', 'i', 'c', 'f']
---    assert list(roundrobin('12345','abcd')) == ['1', 'a', '2', 'b', '3', 'c', '4', 'd', '5']
-    
---    assert list(tuples(range(1,4), 2)) == [(1, 1), (1, 2), (1, 3), 
---                   (2, 1), (2, 2), (2, 3), (3, 1), (3, 2), (3, 3)]
-    
---    assert is_ugly(236) is True
---    assert is_ugly(71) is False
---    assert is_ugly(0) is True
---    assert is_ugly(1) is False
-    
---    assert count_ugly_numbers("1") == 0 
---    assert count_ugly_numbers("9") == 1
---    assert count_ugly_numbers("011") == 6
---    assert count_ugly_numbers("12345") == 64
---    print "passed all tests!"
+isUgly :: Int -> Bool
+isUgly n = any divisible [2,3,5,7]
+    where divisible k = n `mod` k == 0
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
-    let inputs  = lines contents
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs  = filter (not . null) $ lines contents
     let outputs = map countUgly inputs
-    mapM print outputs
+    mapM_ print outputs
 

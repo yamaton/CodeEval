@@ -3,7 +3,7 @@ module Utils where
 -- Haskell toolbox for CodeEval Problems
 import Data.Char (intToDigit)
 import Numeric (showIntAtBase, readHex)
-import Data.List (intercalate, nub, sort)
+import Data.List (intercalate, nub, sort, permutations)
 import Control.Monad (forM, replicateM)
 import Control.Monad.State (evalState, get, put)
 import Data.Map (fromListWith, toList)
@@ -26,11 +26,19 @@ split c s = case dropWhile (== c) s of
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
 
+
 -- | Join elements in [String] by inserting String in between them
 -- >>> join ";" ["a", "bc", "  ", "dd  f"]
 -- "a;bc;  ;dd  f"
 join :: String -> [String] -> String
 join = intercalate
+
+
+-- | Partial Permutations
+-- >>> partialPermutations 2 [1 .. 4]
+-- [[1,2],[2,1],[1,3],[3,1],[1,4],[4,1],[2,3],[3,2],[2,4],[4,2],[3,4],[4,3]]
+partialPermutations :: Int -> [a] -> [[a]]
+partialPermutations n xs = concatMap permutations $ combinations n xs
 
 
 -- | Combinations 
@@ -51,7 +59,6 @@ combinations n xs
 
 
 -- | Equivalent to `combinations_with_relacement` in itertools of Python,
---
 -- >>> combinationsWithReplacement 2 "abc"
 -- ["aa","ab","ac","bb","bc","cc"]
 combinationsWithReplacement :: Ord a => Int -> [a] -> [[a]]
@@ -59,7 +66,6 @@ combinationsWithReplacement n xs = nub $ map sort $ replicateM n xs
 
 
 -- | Equivalent to the command in Mathematica
---
 -- >>> tuples 2 "abc"
 -- ["aa","ab","ac","ba","bb","bc","ca","cb","cc"]
 tuples :: Int -> [a] -> [[a]]
@@ -97,7 +103,6 @@ integerDigits n = map (read . (:[])) (show n)
 --integerDigits' n = reverse . map (`mod` 10) $ takeWhile (> 0) $ iterate (`div` 10) n
 
 -- | Digits to integer
---
 -- >>> fromDigits [1,6,1,5,2]
 -- 16152
 fromDigits :: [Int] -> Int
@@ -154,7 +159,6 @@ intToBin n = showIntAtBase 2 intToDigit n ""
 -- | Hex string to integer
 -- >>> hexToInt "ffffff"
 -- 16777215
--- 
 -- >>> hexToInt "Ab"
 -- 171
 hexToInt :: String -> Int
@@ -175,5 +179,4 @@ takeEvery n xs =
   case drop (n - 1) xs of
     []     -> []
     (y:ys) -> y : takeEvery n ys 
-
 

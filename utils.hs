@@ -7,7 +7,7 @@ import Data.List (intercalate, nub, sort)
 import Control.Monad (forM, replicateM)
 import Control.Monad.State (evalState, get, put)
 import Data.Map (fromListWith, toList)
-
+import Test.QuickCheck
 
 -- |  Round-Robin 
 -- >>> roundRobin ["abc", "d", "ef"]
@@ -33,7 +33,7 @@ join :: String -> [String] -> String
 join = intercalate
 
 
--- | Combinations
+-- | Combinations 
 -- >>> combinations 2 [1 .. 4]
 -- [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
 combinations :: Int -> [a] -> [[a]]
@@ -96,7 +96,6 @@ integerDigits :: Int -> [Int]
 integerDigits n = map (read . (:[])) (show n)
 --integerDigits' n = reverse . map (`mod` 10) $ takeWhile (> 0) $ iterate (`div` 10) n
 
-
 -- | Digits to integer
 --
 -- >>> fromDigits [1,6,1,5,2]
@@ -104,11 +103,21 @@ integerDigits n = map (read . (:[])) (show n)
 fromDigits :: [Int] -> Int
 fromDigits xs = read $ concatMap show xs
 
+---- For quickCheck...
+--prop_integer :: Int -> Bool
+--prop_integer n       = 
+--  not (n < 0) ==> 
+--    n == fromDigits $ integerDigits n
 
--- factorInteger :: Int -> [Int]
+--prop_digits :: [Int] -> Bool
+--prop_digits xs  =  
+--    xs == integerDigits $ fromDigits xs
 
+factorInteger :: Int -> [Int]
+factorInteger = undefined
 
--- divisors :: Int -> [Int]
+divisors :: Int -> [Int]
+divisors = undefined
 
 -- | Check if integer is palindrome
 -- >>> isPalindrome 3
@@ -166,3 +175,5 @@ takeEvery n xs =
   case drop (n - 1) xs of
     []     -> []
     (y:ys) -> y : takeEvery n ys 
+
+

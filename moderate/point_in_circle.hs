@@ -28,32 +28,23 @@ true
 import System.Environment (getArgs)
 import Text.Regex.Posix
 
+reader :: String -> [Double]
+reader s = map read (tail xs)
+  where  
+    pattern = "Center: +\\((-?[.0-9]+), +(-?[.0-9]+)\\); +Radius: +(-?[.0-9]+); +Point: +\\((-?[.0-9]+), (-?[.0-9]+)\\)"
+    (xs:_) = (s =~ pattern :: [[String]])
 
-reader :: String -> (Int, Int, Int, Int, Int)
-reader s =  
-    where  pattern = "Center: +\\((-?[.0-9]+), +(-?[.0-9]+)\\); +Radius: +(-?[.0-9]+); +Point: +\\((-?[.0-9]+), (-?[.0-9]+)\\)"
-           matching = s' =~ pattern
-
-def reader(s):
-    result = regex.search(s)
-    (x, y, r, px, py) = map(float, result.groups())
-    return (x, y, r, px, py)
-
-
-def is_point_in_circle(x, y, r, px, py):
-    dist_squared = (x - px)**2 + (y - py)**2
-    return "true" if dist_squared < r*r else "false"
-
+isPointInCircle :: Double -> Double -> Double -> Double -> Double -> Bool
+isPointInCircle x y r px py = distSquared < r^2
+    where distSquared = (x - px)^2 + (y - py)^2
 
 boolToString :: Bool -> String 
 boolToString True  = "true"
 boolToString False = "false"
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
-    let input = 
-
-    out = [is_point_in_circle(x, y, r, px, py) for (x, y, r, px, py) in data]
-    for x in out:
-        print x
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = map reader $ lines contents
+    let outputs = [isPointInCircle x y r px py | [x, y, r, px, py] <- inputs]
+    mapM_ (putStrLn . boolToString) outputs

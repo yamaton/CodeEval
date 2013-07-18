@@ -41,11 +41,15 @@ ERROR
 ZERO
 FIVE
 ```
+
+[Comment] 
+CodeEval (Haskell 7.4.1) cannot import Data.Map (lookupLE) for some reasons...
+
 -}
 
 import System.Environment (getArgs)
 import Data.Maybe (fromJust)
-import Data.Map (fromList, lookupLE)
+import Data.Map (lookupLE, fromList)
 import Data.List (intercalate, sort)
 
 

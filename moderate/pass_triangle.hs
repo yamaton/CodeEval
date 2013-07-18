@@ -3,7 +3,6 @@ pass_triangle.hs
 
 Challenge Description
 ======================
-
 By starting at the top of the triangle and moving to adjacent 
 numbers on the row below, the maximum total from top to bottom is 27.
 ```
@@ -35,16 +34,17 @@ So for the given example the correct answer would be
 
 import System.Environment (getArgs)
 
-def add_neighbour_max(sec1, sec2):
-    reduction = map(max, zip(sec1[:-1], sec1[1:]))
-    return [x + y for (x,y) in zip(sec2, reduction)]
+addNeighbourMax :: [Int] -> [Int] -> [Int]
+addNeighbourMax xs acc = zipWith (+) reduced xs
+  where reduced = zipWith max (tail acc) (init acc)
 
-def max_triangle_path(triangle):
-    out = reduce(add_neighbour_max, reversed(triangle))
-    return out[0]
+maxPassTriangle :: [[Int]] -> Int
+maxPassTriangle xxs = out
+  where (out:_) = foldr1 addNeighbourMax xxs
 
-if __name__ == '__main__':
-    with open(sys.argv[1], "r") as f:
-        data = [[int(x) for x in s.split()] for s in f]
-    
-    print max_triangle_path(data)
+main = do
+  f:_ <- getArgs
+  contents <- readFile f
+  let input = [map read (words line) | line <- lines contents]
+  print $ maxPassTriangle input
+  

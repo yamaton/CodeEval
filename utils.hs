@@ -171,6 +171,7 @@ hexToInt s = (fst . head) $ readHex s
 count :: Eq a => a -> [a] -> Int
 count x = length . filter (== x)
 
+
 -- | Take Every n elements from a list
 -- >>> takeEvery 10 [1..55]
 -- [10,20,30,40,50]
@@ -179,4 +180,14 @@ takeEvery n xs =
   case drop (n - 1) xs of
     []     -> []
     (y:ys) -> y : takeEvery n ys 
+
+
+-- | reshape list into list of list
+-- >>> reshapeBy 3 [1..10]
+-- [[1,2,3],[4,5,6],[7,8,9],[10]]
+reshapeBy :: Int -> [a] -> [[a]]
+reshapeBy n xs = 
+  case splitAt n xs of
+    ([], _)  -> []
+    (ys,zs)  -> ys : reshapeBy n zs
 

@@ -30,18 +30,22 @@ ooo,oop,opo,opp,poo,pop,ppo,ppp
 -}
 
 import System.Environment (getArgs)
-import Data.List (intercalate)
+import Control.Monad (replicateM)
+import Data.List (intercalate, nub, sort)
 
 
-combinationsWithReplacement :: (Eq a) => Int -> [a] -> [[a]]
+combinationsWithReplacement :: Ord a => Int -> [a] -> [[a]]
+combinationsWithReplacement n xs = sort . nub $ replicateM n xs
+
 
 reader :: String -> (Int, String)
 reader s = (read former, latter)
     where (former, _:latter) = break (== ',') s
+
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = map reader $ filter (not . null) $ lines contents
     let outputs = [combinationsWithReplacement n xs | (n, xs) <- inputs]
-    mapM (putStrLn . (intercalate ",")) outputs
+    mapM_ (putStrLn . (intercalate ",")) outputs

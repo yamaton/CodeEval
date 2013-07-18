@@ -44,47 +44,42 @@ FIVE
 -}
 
 import System.Environment (getArgs)
+import Data.Maybe (fromJust)
+import Data.Map (fromList, lookupLE)
+import Data.List (intercalate, sort)
 
 
-def count_bill_coins(money):
-    bill_coins = [10000, 5000, 2000, 1000, 500, 200, 100, 50, 25, 10, 5, 1]
-    d = {10000: "ONE HUNDRED", 5000: "FIFTY", 2000: "TWENTY", 
-         1000: "TEN", 500: "FIVE", 200: "TWO", 100: "ONE", 50: "HALF DOLLAR",
-         25: "QUARTER", 10: "DIME", 5: "NICKEL", 1: "PENNY"}
-    
-    out = []
-    rest = money
-    for x in bill_coins:
-        while rest >= x:
-            out.append(x)
-            rest -= x
-    return sorted([d[i] for i in out])
+countBillAndCoins :: Int -> [String]
+countBillAndCoins 0    = []
+countBillAndCoins cent = name : (countBillAndCoins (cent - amount))
+  where
+    dict = fromList [(10000, "ONE HUNDRED"), (5000, "FIFTY"), (2000, "TWENTY"), 
+         (1000, "TEN"), (500, "FIVE"), (200, "TWO"), (100, "ONE"), (50, "HALF DOLLAR"),
+         (25, "QUARTER"), (10, "DIME"), (5, "NICKEL"), (1, "PENNY")]
+    (amount, name) = fromJust $ lookupLE cent dict
 
 
-def find_change(pp, ch):
-    """Return change for given purchase price and cash"""
-    pp = int(pp * 100)
-    ch = int(ch * 100)
-    
-    if pp > ch:
-        return ["ERROR"]
-    elif pp == ch:
-        return ["ZERO"]
-    else:
-        return count_bill_coins(ch - pp)
+findChange :: Double -> Double -> String
+findChange pp ch
+  | pp > ch   = "ERROR"
+  | pp == ch  = "ZERO"
+  | otherwise = intercalate "," $ sort (countBillAndCoins changeInCent)
+    where 
+      [ppInt, chInt] = (map (\x -> round (100 * x)) [pp, ch] :: [Int])
+      changeInCent = chInt - ppInt
 
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
-                "" -> []
-                s' -> w : split c s''
-                    where (w, s'') = break (== c) s'
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
-join :: Char -> [String] -> String
-join c s = intercalate (c:[]) s
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let input = [map read (split ';' s) | s <- lines contents]
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs  = [map read (split ';' s) | s <- lines contents]
+  let outputs = [findChange pp ch | [pp, ch] <- inputs]
+  mapM_ putStrLn outputs
+

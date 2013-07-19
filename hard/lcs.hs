@@ -20,6 +20,9 @@ The longest common subsequence. Ensure that there are no trailing empty spaces o
 ```
 MJAU
 ```
+
+[Comment]
+    ver 0.9 ... lcs using Data.List (subsequences) is too slow to pass CodeEval.
 -}
 import System.Environment (getArgs)
 import Data.List (subsequences, intersect)

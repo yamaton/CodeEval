@@ -34,7 +34,7 @@ Your program should accept as its first argument a path to a filename.The input 
 
 Output sample
 -------------
-For each set of input produce a single line of output which is the change to be returned to the customer. In case the CH < PP, print out ERROR. If CH == PP, print out ZERO. For all other cases print the amount that needs to be returned, in terms of the currency values provided. The output should be alphabetically sorted. eg.
+For each set of input produce a single line of output which is the change to be returned to the customer. In case the CH < PP, print out ERROR. If CH == PP, print out ZERO. For all other cases print the amount that needs to be returned, in terms of the currency values provided. The output should be sorted in highest-to-lowest order (DIME,NICKEL,PENNY). eg.
 ```
 NICKEL,PENNY
 ERROR
@@ -49,25 +49,38 @@ CodeEval (Haskell 7.4.1) cannot import Data.Map (lookupLE) for some reasons...
 
 import System.Environment (getArgs)
 import Data.Maybe (fromJust)
-import Data.Map (lookupLE, fromList)
+--import Data.Map (lookupLE, fromList)
 import Data.List (intercalate, sort)
 
 
+--countBillAndCoins :: Int -> [String]
+--countBillAndCoins 0    = []
+--countBillAndCoins cent = name : (countBillAndCoins (cent - amount))
+--  where
+--    dict = fromList [(10000, "ONE HUNDRED"), (5000, "FIFTY"), (2000, "TWENTY"), 
+--         (1000, "TEN"), (500, "FIVE"), (200, "TWO"), (100, "ONE"), (50, "HALF DOLLAR"),
+--         (25, "QUARTER"), (10, "DIME"), (5, "NICKEL"), (1, "PENNY")]
+--    (amount, name) = fromJust $ lookupLE cent dict
+
+
+-- without using `lookupLE`
 countBillAndCoins :: Int -> [String]
 countBillAndCoins 0    = []
 countBillAndCoins cent = name : (countBillAndCoins (cent - amount))
   where
-    dict = fromList [(10000, "ONE HUNDRED"), (5000, "FIFTY"), (2000, "TWENTY"), 
+    dict = [(10000, "ONE HUNDRED"), (5000, "FIFTY"), (2000, "TWENTY"), 
          (1000, "TEN"), (500, "FIVE"), (200, "TWO"), (100, "ONE"), (50, "HALF DOLLAR"),
          (25, "QUARTER"), (10, "DIME"), (5, "NICKEL"), (1, "PENNY")]
-    (amount, name) = fromJust $ lookupLE cent dict
+    numbers = map fst dict
+    amount = head $ dropWhile (> cent) numbers
+    name = fromJust $ lookup amount dict
 
 
 findChange :: Double -> Double -> String
 findChange pp ch
-  | pp > ch   = "ERROR"
-  | pp == ch  = "ZERO"
-  | otherwise = intercalate "," $ sort (countBillAndCoins changeInCent)
+  | ppInt > chInt   = "ERROR"
+  | ppInt == chInt  = "ZERO"
+  | otherwise = intercalate "," (countBillAndCoins changeInCent)
     where 
       [ppInt, chInt] = (map (\x -> round (100 * x)) [pp, ch] :: [Int])
       changeInCent = chInt - ppInt

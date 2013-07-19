@@ -26,11 +26,13 @@ aht,ath,hat,hta,tah,tha
 import System.Environment (getArgs)
 import Data.List (permutations, sort, intercalate, nub)
 
+strPerm :: String -> [String]
+strPerm = sort . nub . permutations 
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = lines contents
-    let outputs = map (sort . nub . permutations) inputs
-    mapM (putStrLn . (intercalate ",")) outputs
+    let outputs = map strPerm inputs
+    mapM_ (putStrLn . (intercalate ",")) outputs
 

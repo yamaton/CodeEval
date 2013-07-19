@@ -31,19 +31,17 @@ Kyotaro Nishimura 1930
 
 import System.Environment (getArgs)
 
-parsar :: String -> (String, [Int])
-parsar s = 
-    let (former, latter) = break (== '|') s
-    in (former, map read (words $ tail latter))
+reader :: String -> (String, [Int])
+reader s = (former, map read (words latter))
+  where (former, (_:latter)) = break (== '|') s
 
-decoder :: (String, [Int]) -> String
-decoder (s, xs) = [s !! (n - 1) | n <- xs]
+decoder :: String -> [Int] -> String
+decoder s xs = map (\n -> s !! (n-1)) xs
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
+    f:_ <- getArgs
+    contents <- readFile f
     let ls = lines contents
-    let inputs = [parsar line | line <- ls, length line > 0]
-    let outputs = map decoder inputs
-    mapM putStrLn outputs
+    let inputs = map reader $ filter (not . null) $ lines contents 
+    let outputs = [decoder s xs | (s, xs) <- inputs]
+    mapM_ putStrLn outputs

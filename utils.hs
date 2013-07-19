@@ -4,6 +4,7 @@ module Utils where
 import Data.Char (intToDigit)
 import Numeric (showIntAtBase, readHex)
 import Data.List (intercalate, nub, sort, permutations)
+import Control.Applicative ((<$>), (<*>))
 import Control.Monad (forM, replicateM)
 import Control.Monad.State (evalState, get, put)
 import Data.Map (fromListWith, toList)
@@ -118,11 +119,34 @@ fromDigits xs = read $ concatMap show xs
 --prop_digits xs  =  
 --    xs == integerDigits $ fromDigits xs
 
-factorInteger :: Int -> [Int]
-factorInteger = undefined
+-- |
+-- >>> cartesianProduct [[1,2,3], [7,8], [9]]
+-- [[1,7,9],[1,8,9],[2,7,9],[2,8,9],[3,7,9],[3,8,9]]
+cartesianProduct :: [[a]] -> [[a]]
+cartesianProduct xxs = foldr (\xs acc -> (:) <$> xs <*> acc) [[]] xxs
 
+-- | 
+-- >>> factorInteger 24
+-- [(2,3),(3,1)]
+factorInteger :: Int -> [(Int, Int)]
+factorInteger 0 = [(0, 1)]
+factorInteger 1 = [(1, 1)]
+factorInteger n = 
+  where
+    primes = sieve $ round (sqrt fromIntegral n)
+    factors = 
+
+-- | 
+-- >>> divisors 24
+-- [1,2,3,4,6,8,12,24]
 divisors :: Int -> [Int]
-divisors = undefined
+divisors 1 = [1]
+divisors n = sort zs
+  where 
+    fi = factorInteger n
+    factors = [ map (n^) [0..pow] | (n, pow) <- fi ]
+    zs = [product xs | xs <- cartesianProduct factors]
+
 
 -- | Check if integer is palindrome
 -- >>> isPalindrome 3

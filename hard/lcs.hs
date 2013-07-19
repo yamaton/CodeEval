@@ -21,45 +21,26 @@ The longest common subsequence. Ensure that there are no trailing empty spaces o
 MJAU
 ```
 -}
-
-import System.Environment
-
-def lcs_length_matrix(s1, s2):
-    M, K = len(s1), len(s2)
-    C = [[0 for j in range(K+1)] for i in range(M+1)]
-    for i in range(M):
-        for j in range(K):
-            C[i+1][j+1] = C[i][j] + 1 if s1[i] == s2[j] else max(C[i+1][j], C[i][j+1])
-    return C        
-
-def backtrack(C, s1, s2, i, j):
-    """Find the longest common subsequence between two strings s1 and s2"""
-    if i==-1 or j==-1:
-        return ""
-    elif s1[i] == s2[j]:
-        return backtrack(C, s1, s2, i-1, j-1) + s1[i]
-    else:
-        if C[i+1][j] > C[i][j+1]:
-            return backtrack(C, s1, s2, i, j-1)
-        else:
-            return backtrack(C, s1, s2, i-1, j)
-    
-def lcs(s1, s2):
-    C = lcs_length_matrix(s1, s2)
-    return backtrack(C, s1, s2, len(s1)-1, len(s2)-1)
-
-def test():
-    assert lcs("abc", "abc") == "abc"
-    assert lcs("XMJYAUZ", "MZJAWXU") == "MJAU"
-    print("passed all tests!")
+import System.Environment (getArgs)
+import Data.List (subsequences, intersect)
+import GHC.Exts (sortWith)
 
 
-if __name__ == '__main__':
-    with open(sys.argv[1], "r") as f:
-        data = [s.rstrip().split(';') for s in f if s.rstrip()]
-    results = (lcs(s1, s2) for (s1, s2) in data)
-    for s in results:
-         print s
-    
-    
-    
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
+
+
+lcs :: String -> String -> String
+lcs s t = if null xs then "" else (last $ sortWith length xs)
+  where xs = intersect (subsequences s) (subsequences t)
+
+
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map (split ';') $ lines contents
+  let outputs = [lcs s t | [s,t] <- inputs]
+  mapM_ putStrLn outputs

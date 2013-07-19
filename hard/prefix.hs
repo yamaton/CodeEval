@@ -24,40 +24,21 @@ Print to stdout, the output of the prefix expression, one per line. e.g.
 
 -}
 
-
 import System.Environment (getArgs)
-        
-def interpret(ch):
-    """Interprete char ch.
-    If ch is digit char, return integer.
-    If ch is either +, *, /, return operator function.
-    """
-    d = {"+": operator.add, "*": operator.mul,
-         "-": operator.sub, "/": operator.div }
-    
-    if d.has_key(ch):
-        return d[ch]
-    else:
-        return int(ch)
 
 
-def evaluate_prefix_expression(seq):
-    """evaluate prefix expression using stack method"""
-    stack = []
-    for x in reversed(seq):
-        if isinstance(x, int):
-            stack.append(x)
-        else:
-            x1 = stack.pop()
-            x2 = stack.pop()
-            out = x(x1,x2)
-            stack.append(out)
-    return stack[0]
+interpret :: => Char -> (Int -> Int -> Int)
+interpret '+' = (+)
+interpret '*' = (*)
+interpret '/' = div
 
+evaluate :: [String] -> Int
+evaluate xs = undefined
 
-
-with open(sys.argv[1], "r") as f:
-    data = [[interpret(x) for x in line.split()] for line in f]
-out = (evaluate_prefix_expression(x) for x in data)
-print "\n".join(str(n) for n in out)
+main = do
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map words $ lines read
+  let outputs = map evaluate inputs
+  mapM_ print outputs
 

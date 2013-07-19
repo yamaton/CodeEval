@@ -21,9 +21,22 @@ Print to stdout the first sequence you find in each line. Ensure that there are 
 ```
 6 3 1
 ```
+
+
 -}
 
 import System.Environment (getArgs)
+import Data.List (tails)
+
+detectCycle :: Eq a => [a] -> Maybe [a]
+
+
+
+
+-- return 0 if xs is aperiodic
+periodicityLength :: Eq a => [a] -> Int
+
+
 
 def detect_cycle(seq):
     """
@@ -61,11 +74,13 @@ def periodicity_len(seq):
         return 0
 
 
+
+
+
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = [map read (words line) | line <- lines contents]
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = [map read (words line) | line <- filter (not . null) (lines contents)]
     let outputs = filter (not . null) $ map findCycle inputs
     mapM putStrLn $ [unword (map show out) | out <- outputs] 
 

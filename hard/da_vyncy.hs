@@ -45,12 +45,13 @@ Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, ad
 ```
 
 [Comment]
-    This code has lots of duplicates and rooms for performance improvements.
+    This code is ugly and there is much rooms for imperformance improvements.
 -}
 
 import System.Environment (getArgs)
 import Data.List (isInfixOf, isPrefixOf, isSuffixOf, delete)
 import GHC.Exts (sortWith)
+
 
 split :: Char -> String -> [String]
 split c s = 
@@ -72,7 +73,6 @@ combinations n xs
                          ++ combinations k zs
         | k == l    = [ys]
         | otherwise = []
-
 
 
 overlapLength :: [String] -> Int
@@ -106,6 +106,7 @@ daVyncy [x] = x
 daVyncy xs = 
   daVyncy $ (merge s1 s2) : (foldl (flip delete) xs [s1, s2])
     where [s1, s2] = last $ sortWith overlapLength $ combinations 2 xs
+
 
 reader :: String -> [String]
 reader s = split ';' s

@@ -39,14 +39,14 @@ For each data set, your program must write its decoded message on a separate lin
 ##*\$
 ```
 2^n - n
+
 -}
 
 import System.Environment (getArgs)
 
 
-
-def take_header(s):
-    return "".join(c for c in itertools.takewhile(lambda c: c not in '01', s))
+takeHeader :: String -> String
+takeHeader = takeWhile (`notElem` "01")
 
 
 def dictkey(header):
@@ -81,9 +81,11 @@ def decode(s):
     return "".join(decoded)
 
 
-if __name__ == '__main__':
-    with open(sys.argv[1], "r") as f:
-        data = [s.rstrip() for s in f]
 
-    for x in data:
-        print decode(x)
+main = do 
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = lines contents
+    let outputs = map decode inputs
+    mapM_ putStrLn outputs
+

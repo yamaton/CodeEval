@@ -30,7 +30,7 @@ For each set of input produce a single line of output containing a floating poin
 ```
 
 [Comment]
-This is closest pair of points problem
+This is closest pair of points problem. See the article for better performance.
 http://en.wikipedia.org/wiki/Closest_pair_of_points_problem
 -}
 
@@ -39,31 +39,51 @@ import Text.Printf (printf)
 
 type Point = (Double, Double)
 
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
+combinations _ [] = []
+combinations n xs  
+  | n == 1    = map (:[]) xs 
+  | otherwise = helper n (length xs) xs    
+    where
+      helper k l ys@(z:zs)        
+        | k < l     = map (z :) (combinations (k-1) zs)
+                         ++ combinations k zs
+        | k == l    = [ys]
+        | otherwise = []
+
 
 closestPairDistance :: [Point] -> Double
+closestPairDistance pts = sqrt $ minimum [distSquared p1 p2 | [p1, p2] <- combinations 2 pts]  
+  where 
+    distSquared :: Point -> Point -> Double
+    distSquared (x1, y1) (x2, y2) = (x1 - x2)^2 + (y1 - y2)^2
+
 
 format :: Double -> String
 format dist
   | dist > 10000 = "INFINITY"
-  | otherwise    = printf "%.4f" d
+  | otherwise    = printf "%.4f" dist
 
---| split string with char 
+
+-- | split string with char 
 split :: (a -> Bool) -> [a] -> [[a]]
 split p xs = case dropWhile p xs of
-              [] -> []
-              ys -> w : split p zs
-                where (w, zs) = break p ys
+  [] -> []
+  ys -> w : split p zs
+    where (w, zs) = break p ys
+
 
 parser :: String -> [[Point]]
-parser s = [map read]
-    where ss = map words $ lines s
-          xss = split (\x -> length x == 1) ss
-
+parser s = [map read xss]
+  where 
+    ss = map words $ lines s
+    xss = split (\x -> length x == 1) ss
 
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = parser contents
-    let outputs = map closestPair inputs
-    mapM putStrLn $ map format outputs
+    let outputs = map closestPairDistance inputs
+    mapM (putStrLn . format) outputs

@@ -125,27 +125,51 @@ fromDigits xs = read $ concatMap show xs
 cartesianProduct :: [[a]] -> [[a]]
 cartesianProduct xxs = foldr (\xs acc -> (:) <$> xs <*> acc) [[]] xxs
 
+
+
+-- | 
+-- >>> primesTo 20
+-- [2,3,5,7,11,13,17,19]
+primesTo :: Int -> [Int]
+primesTo 2 = [2]
+primesTo n = 2 : sieve [3,5..n] where
+  sieve ys@(p:xs) 
+    | p*p > n   = ys
+    | otherwise = p : sieve (xs `minus` [p*p, p*p+2*p..])
+
+-- |
+-- >>> minus [2,3,5,6] [1,3,6]
+-- [2,5]
+minus xxs@(x:xs) yys@(y:ys) = case (compare x y) of 
+           LT -> x : minus  xs  yys
+           EQ ->     minus  xs   ys 
+           GT ->     minus xxs   ys
+minus xs _  = xs
+
 -- | 
 -- >>> factorInteger 24
 -- [(2,3),(3,1)]
 factorInteger :: Int -> [(Int, Int)]
 factorInteger 0 = [(0, 1)]
 factorInteger 1 = [(1, 1)]
-factorInteger n = 
-  where
-    primes = sieve $ round (sqrt fromIntegral n)
-    factors = 
+factorInteger n = filter (\(_, pow) -> pow > 0) (zip primes powers) where
+  divCount :: Int -> Int -> Int
+  divCount m p = 
+    if (m `mod` p /= 0) 
+      then 0 
+      else 1 + divCount (m `div` p) p
+  primes = primesTo $ (round . sqrt) (fromIntegral n)
+  powers = map (divCount n) primes
 
 -- | 
 -- >>> divisors 24
 -- [1,2,3,4,6,8,12,24]
 divisors :: Int -> [Int]
 divisors 1 = [1]
-divisors n = sort zs
+divisors n = sort [product xs | xs <- cartesianProduct factors]
   where 
     fi = factorInteger n
     factors = [ map (n^) [0..pow] | (n, pow) <- fi ]
-    zs = [product xs | xs <- cartesianProduct factors]
 
 
 -- | Check if integer is palindrome

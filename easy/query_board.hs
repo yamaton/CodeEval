@@ -15,7 +15,7 @@ SetCol j x: it means that all values in the cells on column "j" have been change
 QueryRow i: it means that you should output the sum of values on row "i".
 QueryCol j: it means that you should output the sum of values on column "j".
 
-The board's dimensions are 256x256
+The board's dimensions are 256 x 256
 "i" and "j" are integers from 0 to 255
 "x" is an integer from 0 to 31
 
@@ -52,11 +52,10 @@ data Command = SetCol | SetRow | QueryCol | QueryRow deriving (Read, Show)
 
 parser :: String -> (Command, [Int])
 parser s = (read w, map read ws)
-             where w:ws = words s
+    where w:ws = words s
 
-main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = map parser $ lines contents
-    mapM print inputs
+main = do
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map parser $ lines contents
+  mapM_ print inputs

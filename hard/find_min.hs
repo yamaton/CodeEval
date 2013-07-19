@@ -36,42 +36,31 @@ Print out the nth element of m for each test case e.g.
 -}
 
 import System.Envionment (getArgs)
-import itertools
 
-def pseudo_random_sequence(k, a, b, c, r):
-    m = a
-    out = [a]
-    for i in range(k-1):
-        m = _pseudo_random_next(m, b, c, r)
-        out.append(m)
-    return out
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
-
-def _pseudo_random_next(current, b, c, r):
-    return (b * current + c) % r
 
 psudoRandomSeq :: Int -> Int -> Int -> Int -> [Int]
 psudoRandomSeq a b c r = iterate (\m -> (b * m + c) `mod` r) a
 
-def find_min(n, k, a, b, c, r):
-    base = pseudo_random_sequence(k, a, b, c, r)
-    j = 0
-    counter = 0
-    while counter < n - k:
-        if j not in base:
-            counter += 1
-            leaving = base[0]
-            base = base[1:]
-            base.append(j)
-            j = leaving if leaving < j else (j + 1)
-        else:
-            j += 1
-    return base[-1]
+
+reader :: String -> [Int]
+reader s = map read $ split ',' s
 
 
-if __name__ == '__main__':
-    with open(sys.argv[1], 'r') as f:
-        data = [[int(n) for n in s.rstrip().split(',')] for s in f]
+findMin :: [Int] -> Int
+findMin xs = 
+  where
+    [n k a b c r] = xs
 
-    for (n, k, a, b, c, r) in data:
-        print find_min(n, k, a, b, c, r)
+
+main = do
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = map reader $ lines contents
+    let outputs = map findMin inputs
+    mapM_ print outputs

@@ -13,7 +13,8 @@ The following operations should be supported with their order (operator preceden
 5   +, -     Add, Subtract (left-to-right precedence)
 ```
 
-## Input sample
+Input sample
+------------
 Your program should accept as its first argument a path to a filename. The input file contains several lines. Each line is one test case. Each line contains mathematical expression. eg.
 ```
 250*14.3
@@ -22,7 +23,8 @@ Your program should accept as its first argument a path to a filename. The input
 (59 - 15 + 3*6)/21
 ```
 
-## Output sample
+Output sample
+-------------
 For each set of input produce a single line of output which is the result of calculation.
 ```
 3575
@@ -33,7 +35,8 @@ For each set of input produce a single line of output which is the result of cal
 
 Note: Don't use any kind of eval function.
 
-## Constraints 
+Constraints 
+-----------
 Each number in input expression is greater than -20,000 and less than 20,000. 
 Each output number is greater than -20,000 and less than 20,000. 
 If output number is a float number it should be rounded to the 5th digit after the dot. 
@@ -45,13 +48,19 @@ And you need to print 16 (and not 16.00000) in case the answer is 16.
 -}
 
 import System.Environment (getArgs)
+import Text.Printf (printf)
 
 calculate :: String -> String
 
+
+formatter :: Double -> String
+formatter x = reverse $ dropWhile (\c -> c == '0' || c == '.') (reverse s)
+  where s = printf "%.5f" x
+
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map read $ lines contents
     let outputs = map calculate inputs
-    mapM putStrLn outputs
+    mapM_ (putStrLn . formatter) outputs
 

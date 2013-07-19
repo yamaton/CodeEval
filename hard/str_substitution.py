@@ -43,6 +43,7 @@ First attempt failed.
 import sys
 import re
 
+
 def reshape(seq, (row, col)):
     """
     This is numpy's reshape equivalent.
@@ -59,18 +60,18 @@ def reshape(seq, (row, col)):
 
 def search_and_replace(s, openQ, patt, repl):
     patt_regex = "(?=%s)" % patt
-    offset = 0  
+    offset = 0
     regions = [m.start() for m in re.finditer(patt_regex, s)]
     for start in regions:
         start += offset  # Necessary because positions are messed up
         end = start + len(patt)
-        ## [for debugging] comment out these 
+        ## [debug]
         # print "".join("." if i else "x" for i in openQ)
         # print s
         # print " "*start + patt + " --> " + repl
         # print ""
         ## Make sure matched region still matchs with the pattern
-        if all(openQ[start:end]) and s[start:end] == patt:  
+        if all(openQ[start:end]) and s[start:end] == patt:
             s = s[:start] + repl + s[end:]
             openQ = openQ[:start] + [False]*len(repl) + openQ[end:]
             offset += len(repl) - len(patt)
@@ -91,9 +92,8 @@ def read_data(line):
     return (s, patt_repl)
 
 
-
 if __name__ == '__main__':
     with open(sys.argv[1], "r") as f:
         data = [read_data(s) for s in f if s.rstrip()]
-    out = (str_substitute(s, patt_repl) for (s,patt_repl) in data)
+    out = (str_substitute(s, patt_repl) for (s, patt_repl) in data)
     print "\n".join(out)

@@ -1,5 +1,6 @@
 {-
-robot_movements.hs
+Robot Movements
+===============
 
 Description
 ------------
@@ -13,49 +14,33 @@ Output sample
 --------------
 Print out the unique number of ways the robot can reach its destination. (The number should be printed as an integer whole number eg. if the answer is 10 (its not !!), print out 10, not 10.0 or 10.00 etc)
 
-
 -}
 
-def robot_movements(grid, start, goal):
-    result = []
-    stack = [ [start] ]
-    delta = [[0, 1], [1, 0], [0, -1], [-1, 0]]
-    maxX, maxY = len(grid), len(grid[0])
-    
-    while stack:
-        # standard breath-fast search
-        path = stack.pop(0)
-        p = path[-1]
-        for direction in delta:
-            nextX = p[0] + direction[0]
-            nextY = p[1] + direction[1]
-            if (0 <= nextX < maxX and 0 <= nextY < maxY 
-                    and (nextX, nextY) not in path):
-                newpath = path[:]
-                newpath.append((nextX, nextY))
-                
-                if (nextX, nextY) == goal:
-                    result.append(newpath)
-                else:
-                    stack.append(newpath)
-    return len(result)
+import Control.Applicative ((<$>), (<*>))
+
+type Point = (Int, Int)
+type Path = [Point]
 
 
-def test():
-    grid = [[0, 1],
-            [2, 3]]
-    assert robot_movements(grid, (0,0), (1,1)) == 2
-    assert robot_movements(grid, (0,0), (0,1)) == 2
-    
-    grid = [[0, 1, 2],
-            [3, 4, 5]]
-    assert robot_movements(grid, (0,0), (1,1)) == 3
-    assert robot_movements(grid, (0,0), (1,0)) == 3
-    print "passed all tests!"
+robotMovements :: [Point] -> Point -> Point -> Int
+robotMovements field start goal = helper [[start]] 0
+  where
+    helper :: [Path] -> Int -> Int
+    helper [[]] count = count
+    helper stack count = helper nextStack nextCount
+      where
+        moves :: Path -> [Path]
+        moves path = map (:path) nextPoints
+          where 
+            ((i, j):past) = path
+            isValid p = (p `elem` field) && (p `notElem` past)
+            nextPoints = filter isValid [(i+1,j), (i-1,j), (i,j+1), (i,j-1)]
+        nextStackTmp = concatMap moves stack  -------------- [BUG !?]
+        nextStack    = filter (\(curr:past) -> curr /= goal) nextStackTmp
+        nextCount = count + (length nextStackTmp - length nextStack)
 
-
-
-if __name__ == '__main__':
-    x = range(16)
-    grid = [x[4*i:4*i+4] for i in range(4)]
-    print robot_movements(grid, (0,0), (3,3))
+main = do
+  let field = (\a b -> (a, b)) <$> [0..1] <*> [0..1]
+  let start = (0,0)
+  let goal  = (0,1)
+  print $ robotMovements field start goal

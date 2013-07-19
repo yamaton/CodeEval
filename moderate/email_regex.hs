@@ -45,10 +45,9 @@ boolToString True  = "true"
 boolToString False = "false"
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = lines contents
     let outputs = map (boolToString . isEmailAddress) inputs
-    mapM putStrLn outputs
+    mapM_ putStrLn outputs
 

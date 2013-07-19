@@ -47,15 +47,16 @@ right
 
 import System.Environment (getArgs)
 
+type Hand -> [String]
 
-def poker(hand1, hand2):
-    outcome = allmax((hand1, hand2), key=hand_rank)
-    if len(outcome) > 1:
-        return 'none'
-    elif outcome[0] == hand1:
-        return 'left'
-    else:
-        return 'right'
+poker :: Hand -> Hand -> String
+poker hand1 hand2 =
+  | length outcome > 1    = "none"
+  | head outcome == hand1 = "left"
+  | otherwise             = "right"
+    where outcome = allMax handRank hand1 hand2
+
+allMax :: Ord a => [a] -> 
 
 
 def allmax(iterable, key=None):

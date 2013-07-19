@@ -18,8 +18,10 @@ import Data.List (intercalate, elemIndex)
 import Data.Char (ord, chr)
 import Data.Maybe (fromJust)
 
+
 shiftCharBy :: Int -> Char -> Char
 shiftCharBy n c =  chr $ ord 'A' + mod (ord c - ord 'A' + n) 26
+
 
 readEvery :: Int -> String -> [Int]
 readEvery n s = map read $ splitEveryN s
@@ -28,12 +30,14 @@ readEvery n s = map read $ splitEveryN s
       "" -> []
       chunk -> chunk : (splitEveryN (drop n t))
 
+
 decode :: Int -> Char
 decode n = ['A' .. 'Z'] !! idx
     where 
         key = "BHISOECRTMGWYVALUZDNFJKPQX"
         c = chr (ord 'A' + n) 
         idx = fromJust (elemIndex c key)
+
 
 main = do 
     let message = "012222 1114142503 0313012513 03141418192102 0113 2419182119021713 06131715070119"

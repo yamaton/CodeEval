@@ -51,8 +51,6 @@ def EratosthenesSieve(N):
 
 
 
-
-
 def divisors(n):
     if n == 0: return None
     if n == 1: return [1]
@@ -111,10 +109,12 @@ def test():
     print "passed all tests!"
 
 
+countSquareSums :: Int -> Int
+countSquareSums = undefined
+
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs  = map read $ lines contents
     let outputs = map countSquareSums inputs
     mapM print outputs

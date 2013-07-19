@@ -1,6 +1,6 @@
 {-
-double_squares.hs
-
+Double Squares
+==============
 Created by Yamato Matsuoka on 2012-07-08.
 
 Description
@@ -29,12 +29,30 @@ For each line of input, print out the prime numbers less than N, in ascending or
 import System.Environment (getArgs)
 import Data.List (intercalate)
 
-sieve :: Int -> [Int]
-sieve n = 
+-- >>> primesTo 20
+-- [2,3,5,7,11,13,17,19]
+primesTo :: Int -> [Int]
+primesTo 2 = [2]
+primesTo n = 2 : sieve [3,5..n] where
+  sieve ys@(p:xs) 
+    | p*p > n   = ys
+    | otherwise = p : sieve (xs `minus` [p*p, p*p+2*p..])
+
+-- |
+-- >>> minus [2,3,5,6] [1,3,6]
+-- [2,5]
+minus :: Ord a => [a] -> [a] -> [a]
+minus xxs@(x:xs) yys@(y:ys) = 
+  case (compare x y) of 
+    LT -> x : minus  xs  yys
+    EQ ->     minus  xs   ys 
+    GT ->     minus xxs   ys
+minus xs _  = xs
+
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = map read $ lines contents
-    let outputs = map sieve inputs
-    mapM putStrLn $ [(intercalate ",") (map read out) | out <- outputs]
+    let outputs = map primesTo inputs
+    mapM_ putStrLn $ [intercalate "," (map show xs) | xs <- outputs]

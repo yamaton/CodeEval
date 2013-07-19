@@ -29,36 +29,37 @@ split c s = case dropWhile (== c) s of
                 s' -> w : split c s''
                     where (w, s'') = break (== c) s'
 
-sieve :: Int -> [Int]
-sieve n 
-    | n < 2     = []
-    | otherwise = 
-        where maxP = round $ sqrt (fromIntegral n)
-            numbers = 
+-- | Eratosthenes Sieve
+-- >>> primesTo 20
+-- [2,3,5,7,11,13,17,19]
+primesTo :: Int -> [Bool]
+primesTo 2    = [2]
+primesTo n = 
+  | n < 2     = []
+  | otherwise = flip evalState initial $ do
+      forM 
+  
+  
+    initial = (take (n + 1) $ repeat True) :: [Bool]
+    maxP = floor . sqrt $ fromIntegral n
+
+
+
 
 primePi :: Int -> Int
-primePi = length . sieve
+primePi = length . primesTo
 
 countPrimes :: Int -> Int -> Int
-countPrimes a b = (primePi b) - (primePi (a - 1))
-
-
-def EratosthenesSieve(N):
-    """Construct a list of primes equal or less than N."""
-    if N < 2:
-        return []
-    numbers = [True] * (N + 1)
-    max_p = int(math.sqrt(N))
-    for p in (i for i in range(2, max_p+1) if numbers[i]):
-        for q in range(p*p, N+1, p):
-            numbers[q] = False
-    return [i for i in range(2, N+1) if numbers[i]]
+countPrimes a b
+  | a > b     = 0
+  | a < 2     = primePi b
+  | otherwise = primePi b - (primePi (a - 1))
 
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = [map read (split ',' line) | line <- lines contents]
-    let outputs = [ countPrimes a b | [a, b] <- inputs ]
+    let outputs = [countPrimes a b | [a, b] <- inputs ]
+    mapM_ print outputs
 

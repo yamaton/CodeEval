@@ -38,8 +38,8 @@ pascalSequence n
     | otherwise = concat $ take n $ iterate pascalNext [1]
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map read $ lines contents
     let outputs = map pascalSequence inputs
     mapM putStrLn [unwords (map show out) | out <- outputs]

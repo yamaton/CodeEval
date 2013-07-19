@@ -41,7 +41,6 @@ decoder s xs = map (\n -> s !! (n-1)) xs
 main = do 
     f:_ <- getArgs
     contents <- readFile f
-    let ls = lines contents
     let inputs = map reader $ filter (not . null) $ lines contents 
     let outputs = [decoder s xs | (s, xs) <- inputs]
     mapM_ putStrLn outputs

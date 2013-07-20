@@ -1,6 +1,6 @@
 {-
-Substring
-==========
+Search String
+=============
 Created by Yamato Matsuoka on 2013-07-18.
 
 Description
@@ -26,22 +26,24 @@ true
 true
 false
 ```
+
+[Comment]
+  Haskell in CodeEval does not have Text.Regex.Posix module.
 -}
 
 import System.Environment (getArgs)
-import Text.RegEx.Posix
+import Text.Regex.Posix ((=~))
 
-def toRegex(s):
-    if '\*' in s:
-        return s
-    elif '*' in s:
-        return s.replace('*', '.*')
-    else:
-        return s
-
-toRegEx :: String -> String
+toRegex :: String -> String
 toRegex s
-  | "\*" `isInfixOf` s = 
+  | '*' `notElem` s  = s
+  | otherwise        = modified ++ toRegex latter
+    where
+      (former, _:latter) = span (/= '*') s
+      idx    = length former
+      modified = if (last former) == '\\'
+                   then former ++ "*"
+                   else former ++ ".*"
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
@@ -49,19 +51,17 @@ split c s = case dropWhile (== c) s of
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
 
-
 boolToStr :: Bool -> String
-boolToStr True = "true"
+boolToStr True  = "true"
 boolToStr False = "false"
 
-
-isContained :: String -> String
-isContained s t = 
+isContained :: String -> String -> Bool
+isContained s t = (s =~ (toRegex t))
     
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map (split ',') $ lines contents
-  let outputs = [isContained s t | (s, t) <- inputs]
+  let outputs = [isContained s t | [s, t] <- inputs]
   mapM_ (putStrLn . boolToStr) outputs
     

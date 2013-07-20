@@ -22,23 +22,37 @@ Print to stdout, the output of the prefix expression, one per line. e.g.
 20
 ```
 
+[Comment]
+I had to transform Int from/to String back and forth such that I can deal with [*, +, 2, 3, 4] as a stack.
+Better data structure needed to remove these unnecessary conversions.
+
 -}
 
 import System.Environment (getArgs)
+import Data.Char (isNumber)
 
-
-interpret :: => Char -> (Int -> Int -> Int)
-interpret '+' = (+)
-interpret '*' = (*)
-interpret '/' = div
+interpret :: String -> (Int -> Int -> Int)
+interpret "+" = (+)
+interpret "-" = (-)
+interpret "*" = (*)
+interpret "/" = div
 
 evaluate :: [String] -> Int
-evaluate xs = undefined
+evaluate xs = helper (reverse xs) [] where
+  helper :: [String] -> [String] -> Int
+  helper [] stack      = read (head stack)
+  helper (y:ys) stack
+    | isHeadNumber     = helper ys (y:stack)
+    | otherwise        = helper ys (out:(drop 2 stack))
+      where
+        isHeadNumber = all isNumber y
+        [n1, n2] = take 2 stack
+        out = show $ (interpret y) (read n1) (read n2)
 
 main = do
   f:_ <- getArgs
   contents <- readFile f
-  let inputs = map words $ lines read
+  let inputs = map words $ lines contents
   let outputs = map evaluate inputs
   mapM_ print outputs
 

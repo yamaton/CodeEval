@@ -32,12 +32,8 @@ def interpret(ch):
     If ch is either +, *, /, return operator function.
     """
     d = {"+": operator.add, "*": operator.mul,
-         "-": operator.sub, "/": operator.div }
-    
-    if d.has_key(ch):
-        return d[ch]
-    else:
-        return int(ch)
+         "-": operator.sub, "/": operator.div}
+    return d[ch] if ch in d else int(ch)
 
 
 def evaluate_prefix_expression(seq):
@@ -49,14 +45,11 @@ def evaluate_prefix_expression(seq):
         else:
             x1 = stack.pop()
             x2 = stack.pop()
-            out = x(x1,x2)
+            out = x(x1, x2)
             stack.append(out)
     return stack[0]
-
-
 
 with open(sys.argv[1], "r") as f:
     data = [[interpret(x) for x in line.split()] for line in f]
 out = (evaluate_prefix_expression(x) for x in data)
 print "\n".join(str(n) for n in out)
-

@@ -35,6 +35,7 @@ http://en.wikipedia.org/wiki/Closest_pair_of_points_problem
 -}
 
 import System.Environment (getArgs)
+import Data.List (sort)
 import Text.Printf (printf)
 
 type Point = (Double, Double)
@@ -54,10 +55,28 @@ combinations n xs
 
 
 closestPairDistance :: [Point] -> Double
-closestPairDistance pts = sqrt $ minimum [distSquared p1 p2 | [p1, p2] <- combinations 2 pts]  
-  where 
-    distSquared :: Point -> Point -> Double
-    distSquared (x1, y1) (x2, y2) = (x1 - x2)^2 + (y1 - y2)^2
+closestPairDistance pts
+  | length pts < 4 = sqrt $ minimum [distSquared p1 p2 | [p1, p2] <- combinations 2 pts]  
+  | otherwise      = if (not . null) dsLR
+                       then min (minimum dsLR) dMin
+                       else dMin
+    where 
+      distSquared :: Point -> Point -> Double
+      distSquared (x1, y1) (x2, y2) = (x1 - x2)^2 + (y1 - y2)^2
+      points = sort pts
+      threshold = (length pts) `div` 2
+      (pointsL, pointsR) = splitAt threshold points
+      (xL0, _) = last pointsL
+      (xR0, _) = head pointsR
+      xMid = (xL0 + xR0) / 2
+
+      dMin = min (closestPairDistance pointsL) (closestPairDistance pointsR)
+      selectedPointsL = [(xL, yL) | (xL, yL) <- pointsL, (xMid - xL) < dMin] 
+      selectedPointsR = [(xR, yR) | (xR, yR) <- pointsR, (xR - xMid) < dMin]
+      dsLR = [distSquared (xL, yL) (xR, yR)| 
+                (xL, yL) <- selectedPointsL, 
+                (xR, yR) <- selectedPointsR,
+                abs (yL - yR) < dMin]
 
 
 format :: Double -> String
@@ -74,8 +93,8 @@ split p xs = case dropWhile p xs of
     where (w, zs) = break p ys
 
 
-parser :: String -> [[Point]]
-parser s = [map read xss]
+reader :: String -> [[Point]]
+reader s = [[(read a, read b)| [a, b] <- xs] | xs <- xss]
   where 
     ss = map words $ lines s
     xss = split (\x -> length x == 1) ss
@@ -84,6 +103,7 @@ parser s = [map read xss]
 main = do 
     f:_ <- getArgs
     contents <- readFile f
-    let inputs = parser contents
+    let inputs = reader contents
     let outputs = map closestPairDistance inputs
-    mapM (putStrLn . format) outputs
+    --mapM print inputs
+    mapM_ (putStrLn . format) outputs

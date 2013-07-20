@@ -3,7 +3,7 @@ Flavius Josephus
 ================
 Description
 -----------
-Flavius Josephus was a famous Jewish historian of the first century, at the time of the destruction of the Second Temple. According to legend, during the Jewish-Roman war he was trapped in a cave with a group of soldiers surrounded by Romans. Preferring death to capture, the Jews decided to form a circle and, proceeding around it, to kill every j'th person remaining until no one was left. Josephus found the safe spot in the circle and thus stayed alive.Write a program that returns a list of n people, numbered from 0 to n-1, in the order in which they are executed.
+Flavius Josephus was a famous Jewish historian of the first century, at the time of the destruction of the Second Temple. According to legend, during the Jewish-Roman war he was trapped in a cave with a group of soldiers surrounded by Romans. Preferring death to capture, the Jews decided to form a circle and, proceeding around it, to kill every j'th person remaining until no one was left. Josephus found the safe spot in the circle and thus stayed alive. Write a program that returns a list of n people, numbered from 0 to n-1, in the order in which they are executed.
 
 Input sample
 -------------
@@ -23,23 +23,31 @@ Print out the list of n people(space delimited) in the order in which they will 
 -}
 
 import System.Environment (getArgs)
-
+import Data.List (delete)
 
 flavius :: Int -> Int -> [Int]
-flavius n step = fraviusHelper 0 step [0 .. n] 
+flavius n step = flaviusHelper step 0 [0 .. (n-1)] 
 
 
-flaviusHelper :: Int -> Int -> [Int]
-flaviusHelper _ _ [] = 
+flaviusHelper :: Int -> Int -> [Int] -> [Int]
+flaviusHelper  _   _   []      = []
+flaviusHelper step ptr people = killed : flaviusHelper step nextPtr (delete killed people)
+  where
+    currIdx = length $ takeWhile (/= ptr) people
+    killed  = last $ take (currIdx + step) $ cycle people
+    nextPtr = last $ take (currIdx + step + 1) $ cycle people
+
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
-    "" -> []
-    s' -> w : s'' where (w, s'') = break (== c) s'
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
+
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
-    let inputs = [map read (split ',' line) | line <- lines contents]
-    let outputs = [flavis n steps | [n, steps] <- inputs]
-    mapM putStrLn [unwords (map show out) | out <- outputs]
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = [map read (split ',' line) | line <- lines contents]
+  let outputs = [flavius n steps | [n, steps] <- inputs]
+  mapM_ putStrLn [unwords (map show out) | out <- outputs]

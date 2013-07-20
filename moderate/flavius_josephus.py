@@ -28,7 +28,7 @@ def flavis(n, step):
     curr = 0
     x = range(n)
     out = []
-    while len(x):
+    while x:
         curr = (curr + step - 1) % len(x)
         out.append(x.pop(curr))
     return out

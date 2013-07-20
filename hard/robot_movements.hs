@@ -20,27 +20,32 @@ import Control.Applicative ((<$>), (<*>))
 
 type Point = (Int, Int)
 type Path = [Point]
+type Field = [Point]
 
 
-robotMovements :: [Point] -> Point -> Point -> Int
-robotMovements field start goal = helper [[start]] 0
+robotMovements :: Field -> Point -> Point -> Int
+robotMovements field start goal = helper [[start]] 0  
   where
     helper :: [Path] -> Int -> Int
-    helper [[]] count = count
-    helper stack count = helper nextStack nextCount
+    helper  []   goalCount = goalCount
+    helper stack goalCount = helper nextStack updateCount  
       where
-        moves :: Path -> [Path]
-        moves path = map (:path) nextPoints
-          where 
-            ((i, j):past) = path
-            isValid p = (p `elem` field) && (p `notElem` past)
-            nextPoints = filter isValid [(i+1,j), (i-1,j), (i,j+1), (i,j-1)]
-        nextStackTmp = concatMap moves stack  -------------- [BUG !?]
+        nextStackTmp = concatMap (moveRobot field) stack
         nextStack    = filter (\(curr:past) -> curr /= goal) nextStackTmp
-        nextCount = count + (length nextStackTmp - length nextStack)
+        updateCount = goalCount + (length nextStackTmp - length nextStack)
+
+
+moveRobot :: Field -> Path -> [Path]
+moveRobot field path = map (:path) nextPoints 
+  where
+    ((i, j):past) = path
+    isValid p = (p `elem` field) && (p `notElem` past)
+    nextPoints = filter isValid [(i+1,j), (i-1,j), (i,j+1), (i,j-1)]
+
 
 main = do
-  let field = (\a b -> (a, b)) <$> [0..1] <*> [0..1]
+  let field = (\a b -> (a, b)) <$> [0..3] <*> [0..3]
   let start = (0,0)
-  let goal  = (0,1)
+  let goal  = (3,3)
   print $ robotMovements field start goal
+

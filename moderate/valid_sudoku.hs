@@ -23,17 +23,47 @@ False
 -}
 
 import System.Environment (getArgs)
+import Data.List (sort, transpose)
 
 type Sudoku = [[Int]]
 isValidSudoku :: Sudoku -> Bool
+isValidSudoku sudoku = rowCheck && colCheck && blockCheck
+  where
+    n = length sudoku
+    theSet = [1..n]
+    rowCheck = all (\row -> sort row == theSet) sudoku
+    colCheck = all (\col -> sort col == theSet) (transpose sudoku)
+    chunkRow = reshapeBy n sudoku
+    blocks = concatMap (concat . (reshapeBy n) . transpose) chunkRow
+    blockCheck = all (\bl -> sort bl == theSet) blocks
 
-parser :: String -> Sudoku
+
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
+
+
+reshapeBy :: Int -> [a] -> [[a]]
+reshapeBy n xs = 
+  case splitAt n xs of
+    ([], _)  -> []
+    (ys,zs)  -> ys : reshapeBy n zs
+
+
+reader :: String -> Sudoku
+reader s = reshapeBy n numbers
+  where 
+    [nStr, sss] = split ';' s
+    n = read nStr
+    numbers = map read $ split ',' sss
 
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
-    let inputs = map parser $ lines contents
+    f:_ <- getArgs
+    contents <- readFile f
+    let inputs = map reader $ lines contents
     let outputs = map isValidSudoku inputs
-    mapM print outputs
+    mapM_ print outputs
 

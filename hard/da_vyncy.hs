@@ -49,7 +49,7 @@ Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, ad
 -}
 
 import System.Environment (getArgs)
-import Data.List (isInfixOf, isPrefixOf, isSuffixOf, delete)
+import Data.List (isInfixOf, isPrefixOf, isSuffixOf, delete, sort)
 import GHC.Exts (sortWith)
 
 
@@ -78,34 +78,30 @@ combinations n xs
 overlapLength :: [String] -> Int
 overlapLength ss
   | isInfixOf sm lg = length sm
-  | otherwise       = max (helper isInfixOf tail sm lg) (helper isSuffixOf init sm lg)
+  | otherwise       = max (helper isPrefixOf tail sm lg) (helper isSuffixOf init sm lg)
     where
       [sm, lg] = sortWith length ss
       helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> Int
       helper f next xs ys = if (f (next xs) ys) then (length xs - 1) else (helper f next (next xs) ys)
 
 
-merge :: String -> String -> String
-merge s1 s2 
-  | isInfixOf sm lg = lg
-  | otherwise       = head $ sortWith length [helperMergeP sm lg,  helperMergeS sm lg]
+merge :: String -> String -> Int -> String
+merge s1 s2 n
+  | n == lenSm                       = lg
+  | take n sm == drop (lenLg - n) lg = lg ++ drop n sm
+  | otherwise                        = sm ++ drop n lg
     where
-      [sm, lg] = sortWith length [s1, s2]
-      helperP xxs xs ys = if (isPrefixOf xs ys) 
-                            then (take (length xxs - length xs) xxs) ++ ys 
-                            else (helperP xxs (tail xs) ys)
-      helperS xxs xs ys = if (isSuffixOf xs ys)
-                            then ys ++ (drop (length xs) xxs)
-                            else (helperS xxs (init xs) ys)
-      helperMergeP xs ys = helperP xs (tail xs) ys       
-      helperMergeS xs ys = helperS xs (init xs) ys                        
+      (lenS1, lenS2) = (length s1, length s2)
+      (sm, lg) = if lenS1 < lenS2 then (s1, s2) else (s2, s1)
+      lenSm = min lenS1 lenS2
+      lenLg = max lenS1 lenS2
 
 
 daVyncy :: [String] -> String
 daVyncy [x] = x
 daVyncy xs = 
-  daVyncy $ (merge s1 s2) : (foldl (flip delete) xs [s1, s2])
-    where [s1, s2] = last $ sortWith overlapLength $ combinations 2 xs
+  daVyncy $ (merge s1 s2 n) : (foldl (flip delete) xs [s1, s2])
+    where (n, [s1, s2]) = last . sort $ map (\pair -> (overlapLength pair, pair)) $ combinations 2 xs
 
 
 reader :: String -> [String]

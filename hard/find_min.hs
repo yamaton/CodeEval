@@ -1,4 +1,6 @@
 {-
+Find Min
+=========
 Description
 ------------
 Credits: This problem appeared in the Facebook Hacker Cup 2013 Hackathon.
@@ -35,7 +37,7 @@ Print out the nth element of m for each test case e.g.
 ```
 -}
 
-import System.Envionment (getArgs)
+import System.Environment (getArgs)
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
@@ -43,9 +45,9 @@ split c s = case dropWhile (== c) s of
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
 
-
-psudoRandomSeq :: Int -> Int -> Int -> Int -> [Int]
-psudoRandomSeq a b c r = iterate (\m -> (b * m + c) `mod` r) a
+-- sequence is reversed ... head of the sequence comes the last of the [Int]
+psudoRandomSeq :: Int -> Int -> Int -> Int -> Int -> [Int]
+psudoRandomSeq k a b c r = reverse $ take k $ iterate (\m -> (b * m + c) `mod` r) a
 
 
 reader :: String -> [Int]
@@ -53,10 +55,20 @@ reader s = map read $ split ',' s
 
 
 findMin :: [Int] -> Int
-findMin xs = 
+findMin xs = helper base 0 0
   where
-    [n k a b c r] = xs
-
+    [n, k, a, b, c, r] = xs
+    base = psudoRandomSeq k a b c r
+    helper :: [Int] -> Int -> Int -> Int
+    helper ys num cnt
+      | cnt == n - k = head ys
+      | otherwise    = 
+          if elem num ys
+            then helper ys (num + 1) cnt
+            else helper (num:(init ys)) nextNum (cnt + 1)
+              where 
+                leaving = last ys
+                nextNum = if leaving < num then leaving else (num + 1)
 
 main = do
     f:_ <- getArgs

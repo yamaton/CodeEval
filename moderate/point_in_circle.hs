@@ -26,16 +26,31 @@ true
 false
 true
 ```
+
+[History]
+ver 1.0  w/o Text.Regex.Posix
+ver 0.9  reader with Text.Regex.Posix 
 -}
 
 import System.Environment (getArgs)
-import Text.Regex.Posix ((=~))
+--import Text.Regex.Posix ((=~))
+
+--reader :: String -> [Double]
+--reader s = map read (tail xs)
+--  where  
+--    pattern = "Center: +\\((-?[.0-9]+), +(-?[.0-9]+)\\); +Radius: +(-?[.0-9]+); +Point: +\\((-?[.0-9]+), (-?[.0-9]+)\\)"
+--    (xs:_) = (s =~ pattern :: [[String]])
+
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
 reader :: String -> [Double]
-reader s = map read (tail xs)
-  where  
-    pattern = "Center: +\\((-?[.0-9]+), +(-?[.0-9]+)\\); +Radius: +(-?[.0-9]+); +Point: +\\((-?[.0-9]+), (-?[.0-9]+)\\)"
-    (xs:_) = (s =~ pattern :: [[String]])
+reader s = map read xs
+  where xs = concatMap (split ',') $ split ';' $ filter (`elem` "0123456789.-,;") s
+
 
 isPointInCircle :: Double -> Double -> Double -> Double -> Double -> Bool
 isPointInCircle x y r px py = distSquared < r^2

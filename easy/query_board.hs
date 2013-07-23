@@ -50,6 +50,12 @@ import System.Environment (getArgs)
 
 data Command = SetCol | SetRow | QueryCol | QueryRow deriving (Read, Show)
 
+
+--queryBoard :: Command -> [Int] -> [Int]
+--queryBoard com xs = helper 
+--  where
+--    helper com state output = 
+
 parser :: String -> (Command, [Int])
 parser s = (read w, map read ws)
     where w:ws = words s
@@ -58,4 +64,5 @@ main = do
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map parser $ lines contents
+  let outputs = [queryBoard command vals | (command, vals) <- inputs]
   mapM_ print inputs

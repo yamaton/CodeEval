@@ -34,7 +34,7 @@ True
 import System.Environment (getArgs)
 
 searchWord :: [String] -> String -> Bool
-searchWord = undefined
+searchWord field word = undefined
 
 
 main = do

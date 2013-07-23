@@ -11,18 +11,17 @@ You are given two strings. Determine if the second string is a substring of the 
 
 Input sample
 ------------
-File containing two comma delimited strings per line. e.g. 
+File containing two comma delimited strings per line. e.g.
 ```
 Hello,ell
-This is good, is 
+This is good, is
 CodeEval,C*Eval
 Old,Young
 ```
 
 Output sample
 -------------
-If the second string is indeed a substring of the first, print out a 'true'(lowercase), else print out a 'false'(lowercase), one per line.
-e.g.
+If the second string is indeed a substring of the first, print out a 'true'(lowercase), else print out a 'false'(lowercase), one per line. e.g.
 ```
 true
 true

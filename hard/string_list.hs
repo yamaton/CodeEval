@@ -36,11 +36,9 @@ import Data.List (intercalate, nub, sort)
 combinationsWithReplacement :: Ord a => Int -> [a] -> [[a]]
 combinationsWithReplacement n xs = sort . nub $ replicateM n xs
 
-
 reader :: String -> (Int, String)
 reader s = (read former, latter)
     where (former, _:latter) = break (== ',') s
-
 
 main = do 
     f:_ <- getArgs

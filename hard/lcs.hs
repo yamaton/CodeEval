@@ -28,13 +28,11 @@ import System.Environment (getArgs)
 import Data.List (subsequences, intersect)
 import GHC.Exts (sortWith)
 
-
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
   "" -> []
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
-
 
 lcs :: String -> String -> String
 lcs s t = if null xs then "" else (last $ sortWith length xs)

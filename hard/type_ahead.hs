@@ -75,9 +75,8 @@ split c s = case dropWhile (== c) s of
 
 
 process :: String -> (Int, String) -> (String, Double)
-process text (n, s) = 
-  where
-    ngram = createNgram 
+process text (n, s) = undefined
+
 
 reader :: String -> (Int, String)
 reader s = (read former, latter)

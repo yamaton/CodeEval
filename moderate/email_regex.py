@@ -34,14 +34,16 @@ true
 import sys
 import re
 
+REGEX = "[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.([a-zA-Z]){2,4}"
+PROG = re.compile(REGEX)
+
+
 def is_email_address(s):
-    regex_string = "[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\.[a-zA-Z0-9]+){1,2}"
-    prog = re.compile(regex_string)
-    return True if prog.match(s) else False
+    return "true" if PROG.match(s) else "false"
 
 if __name__ == '__main__':
     with open(sys.argv[1], "r") as f:
         data = [s.rstrip() for s in f]
     out = (is_email_address(s) for s in data)
-    formatted = "\n".join(str(s).lower() for s in out)
-    print formatted
+    for i in out:
+        print i

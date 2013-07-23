@@ -1,4 +1,6 @@
 {-
+Following Integer
+==================
 Description
 ------------
 Credits: This challenge has appeared in a past google competition
@@ -69,9 +71,10 @@ def test():
     print "passed all tests!"
 
 
-if __name__ == '__main__':
-    with open(sys.argv[1], "r") as f:
-        data = [int(i) for i in f]
-    result = map(next_number, data)
-    for n in result:
-        print n
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map nextNumber inputs
+  mapM_ print outputs
+

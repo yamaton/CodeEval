@@ -35,7 +35,7 @@ True
 import sys
 
 
-GRID = ['ABCE','SFCS','ADEE']
+GRID = ['ABCE', 'SFCS', 'ADEE']
 
 
 def word_search(s):
@@ -43,13 +43,11 @@ def word_search(s):
 
     string = "".join(GRID)
     pos = [i for (i, ch) in enumerate(string) if ch == s[0]]
-    starts = [(i/row, i%col) for i in pos]
-    
+    starts = [(i / row, i % col) for i in pos]
     for start in starts:
         current = start
         visited = [current]
-        while
-
+    pass
 
 
 if __name__ == '__main__':

@@ -1,11 +1,13 @@
 {-
-point_in_circle.hs
-
-## Challenge Description
+Point in Circle
+================
+Challenge Description
+---------------------
 Having coordinates of the center of a circle, it's radius and coordinates 
 of a point you need to define whether this point is located inside of this circle.
 
-## Input sample
+Input sample
+-------------
 Your program should accept as its first argument a path to a filename. 
 Input example is the following
 ```
@@ -16,7 +18,8 @@ Center: (-9.86, 1.95); Radius: 47.28; Point: (6.03, -6.42)
 
 All numbers in input are between -100 and 100
 
-## Output sample
+Output sample
+-------------
 Print results in the following way.
 ```
 true
@@ -26,7 +29,7 @@ true
 -}
 
 import System.Environment (getArgs)
-import Text.Regex.Posix
+import Text.Regex.Posix ((=~))
 
 reader :: String -> [Double]
 reader s = map read (tail xs)

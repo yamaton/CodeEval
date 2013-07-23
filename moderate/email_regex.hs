@@ -48,6 +48,6 @@ main = do
     f:_ <- getArgs
     contents <- readFile f
     let inputs = lines contents
-    let outputs = map (boolToString . isEmailAddress) inputs
-    mapM_ putStrLn outputs
+    let outputs = map isEmailAddress inputs
+    mapM_ (putStrLn . boolToString) outputs
 

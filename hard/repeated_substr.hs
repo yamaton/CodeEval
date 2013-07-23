@@ -32,7 +32,6 @@ am so uniqe
 import System.Environment (getArgs)
 
 
-
 main = do 
   f:_ <- getArgs
   contents <- readFile f

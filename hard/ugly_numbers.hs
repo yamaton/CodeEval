@@ -66,11 +66,11 @@ genNumbers (x:xs) =
 concatComb :: String -> [[String]]
 concatComb s = foldr helper [[""]] s
   where 
-      helper :: Char -> [[String]] -> [[String]]
-      helper c [[""]] = [[[c]]]
-      helper c xxs = ap [(f c), (g c)] xxs
-      f c (ss:yss) = (c:ss) : yss
-      g c yss = [c] : yss
+    helper :: Char -> [[String]] -> [[String]]
+    helper c [[""]] = [[[c]]]
+    helper c xxs = ap [(f c), (g c)] xxs
+    f c (ss:yss) = (c:ss) : yss
+    g c yss = [c] : yss
 
 -- |
 -- >>> strToNumber [["123"], ["12", "3"], ["1", "23"], ["1", "2", "3"]]

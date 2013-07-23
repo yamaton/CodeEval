@@ -30,6 +30,8 @@ Print out the new M*N matrix (in row major form) with each position(except the o
 
 import System.Environment (getArgs)
 
+mineSweep :: Int -> Int -> String -> String
+
 
 def minesweep(row, col, mines):
     x = add_wall(row, col, mines)
@@ -53,17 +55,28 @@ def count_mines(i, j, mines):
         return str(surroundings.count('*'))
 
 
-def read_data(s):
-    pos, mines = s.rstrip().split(';')
-    row, col = [int(n) for n in pos.split(',')]
-    mines = [mines[i * col : (i + 1) * col] for i in range(row)]
-    return row, col, mines 
+countMines :: (Int, Int) -> [String] -> Char
+countMines (i, j) xxs
+  | m !! i !! j == '*' = '*'
+  | otherwise          = 
 
 
-if __name__ == '__main__':
-    with open(sys.argv[1], 'r') as f:
-        data = [read_data(s) for s in f]
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
-    for (row, col, x) in data:
-        out = minesweep(row, col, x)
-        print "".join(out)
+
+reader :: String -> (Int, Int, String)
+reader s = (m, n, latter) where
+  (former, latter) = split ';' s
+  [m, n] = map read (split ',' former)
+
+
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map reader $ lines contents
+  let outputs = [mineSweep m n s | (m, n, s) <- inputs]
+  mapM_ putStrLn outputs

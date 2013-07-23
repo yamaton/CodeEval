@@ -1,6 +1,6 @@
 {-
-Search String
-=============
+String Searching
+=================
 Created by Yamato Matsuoka on 2013-07-18.
 
 Description
@@ -64,4 +64,3 @@ main = do
   let inputs = map (split ',') $ lines contents
   let outputs = [isContained s t | [s, t] <- inputs]
   mapM_ (putStrLn . boolToStr) outputs
-    

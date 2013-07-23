@@ -29,37 +29,33 @@ Print out the minimum path sum for each matrix. e.g.
 
 import System.Environment (getArgs)
 
+minPathSum :: [[Int]] -> Int
+minPathSum matrix = helper matrix (n-1) (n-1)
+    where n = length matrix
 
-def min_path_sum(N, data):
-    return _rsum(data, N-1, N-1)
+helper :: [[Int]] -> Int -> Int -> Int
+helper matrix i j
+  | isOutside i j = 100000
+  | isTopLeft i j = matrix !! 0 !! 0
+  | otherwise     = (matrix !! i !! j) + min (helper matrix (i-1) j) (helper matrix i (j-1))
+    where
+      n = length matrix
+      isOutside p q = p < 0 || q < 0 || p >= n || q >= n 
+      isTopLeft p q = p == 0 && q == 0
 
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
-def _rsum(data, i, j):
-    N = len(data)
-    if i < 0 or j < 0 or i >= N or j >= N:
-        return 100000
-    elif(i == 0 and j == 0):
-        return data[0][0]
-    else:
-        return min(_rsum(data, i-1, j), _rsum(data, i, j-1)) + data[i][j]
-
-
-
-def read_data(text):
-    out = []
-    lines = [l.rstrip() for l in text]
-    ptr = 0
-    while ptr < len(lines):
-        size = int(lines[ptr])
-        start = ptr + 1
-        data = [[int(n) for n in l.split(',')] for l in lines[start:start+size]]
-        out.append((size, data))
-        ptr += size + 1
-    return out
+reader :: [String] -> [[[Int]]]
+reader xs = undefined
 
 
-if __name__ == '__main__':
-    with open(sys.argv[1], 'r') as f:
-        data = read_data(f)
-    for (n, matrix) in data:
-        print min_path_sum(n, matrix)
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = reader (lines contents)
+  let outputs = map minPathSum inputs
+  mapM_ print outputs

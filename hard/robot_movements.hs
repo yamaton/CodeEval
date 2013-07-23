@@ -48,4 +48,3 @@ main = do
   let start = (0,0)
   let goal  = (3,3)
   print $ robotMovements field start goal
-

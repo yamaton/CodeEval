@@ -22,36 +22,25 @@ Print to stdout the first sequence you find in each line. Ensure that there are 
 6 3 1
 ```
 
-
 -}
 
 import System.Environment (getArgs)
 import Data.List (tails)
+import Data.Maybe (isNothing, fromJust)
+import Data.Control.Applicative ((<$>), (<*>)) 
 
 detectCycle :: Eq a => [a] -> Maybe [a]
-
-
+detectCycle xs = take <$> (periodicityLength <$> zs) <*> zs
+  where zs = find (\ys -> periodicityLength ys == 0) (tails xs)
 
 
 -- return 0 if xs is aperiodic
 periodicityLength :: Eq a => [a] -> Int
+periodicityLength x:xs = 
+  where
+    len = length xs
+    helper acc zs =     
 
-
-
-def detect_cycle(seq):
-    """
-    Crude algorithm to find a cycle such that
-    
-    - Select the subsequence seq[n:] such that n is the minimum.
-    - Return 1 cycle orbit of the subsequence.
-    """
-    for n in range(len(seq)):
-        x = seq[n:]
-        period = periodicity_len(x)
-        if period > 0:
-            return x[:period]
-    else:
-        return False
 
 
 def periodicity_len(seq):
@@ -74,13 +63,9 @@ def periodicity_len(seq):
         return 0
 
 
-
-
-
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = [map read (words line) | line <- filter (not . null) (lines contents)]
     let outputs = filter (not . null) $ map findCycle inputs
-    mapM putStrLn $ [unword (map show out) | out <- outputs] 
-
+    mapM_ putStrLn $ [unword (map show out) | out <- outputs] 

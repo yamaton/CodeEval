@@ -1,9 +1,8 @@
 {-
-Created by Yamato Matsuoka on 2013-07-03 [UNDONE]
+Created by Yamato Matsuoka on 2013-07-03
 
 Balanced Smileys
 =================
-
 Description
 ------------
 Credits: This problem appeared in the Facebook Hacker Cup 2013 Hackathon.
@@ -45,39 +44,47 @@ NO
 -}
 
 import System.Environment (getArgs)
-import Data.List (isInfixOf)
+import Data.Text (pack, unpack, count, splitOn, append, Text)
+import Control.Applicative ((<$>), (<*>))
 
-isBalanced :: String -> Bool
-isBalanced "" = True
-isBalanced s
-  | any (`notElem` allowed) s = False
-  | isParenthesisClosed s     = True
-  | otherwise                 = 
-      if isInfixOf ":)"
+--isBalanced :: String -> Bool
+--isBalanced "" = True
+--isBalanced s
+--  | any (`notElem` allowed) s = False
+--  | otherwise                 = any isBalancedProperly (realizations (pack s))
+--    where 
+--      allowed = ['a' .. 'z'] ++ "(): "
 
-    where allowed = ['a' .. 'z'] ++ "(): "
-          regex   = mkRegex ":\)|:\("
-          
-
-
-isParenthesisClosed :: String -> Bool
-isParenthesisClosed s = (all (>= 0) stack) && (last stack == 0)
+realizations :: Text -> [Text] 
+realizations text = zs
   where 
-    stack = scanl helper 0 s :: [Int]
-      where 
-        helper :: Int -> Char -> Int
-        helper acc '(' = acc + 1
-        helper acc ')' = acc - 1
-        helper acc _   = acc
+    [smile, frown] = map pack [":)", ":("]
+    subTxt   = splitOn smile text :: [Text]
+    textList  = foldl (\acc txt -> append <$> acc <*> [txt, smile `append` txt]) [head subTxt] (tail subTxt) :: [Text]
+    xxs = map (splitOn frown) textList :: [[Text]]
+    zs = map (foldl1 (\acc txt -> append <$> acc <*> [txt, frown `append` txt])) xxs :: [Text]
+
+--isBalancedProperly :: Text -> Bool
+--isBalancedProperly text = isAllowed && isBalanced
+--  where 
+--    helper :: Int -> Char -> Int
+--    helper acc '(' = acc + 1
+--    helper acc ')' = acc - 1
+--    helper acc _   = acc
+--    s = unpack text    
+--    stack = scanl helper 0 s :: [Int]
+--    isBalanced = last stack == 0
+--    isAllowed  = all (>= 0) stack
 
 boolToYesNo :: Bool -> String
 boolToYesNo True  = "YES"
 boolToYesNo False = "NO"
 
---main = do 
---  args <- getArgs
---  let filename = head args
---  contents <- readFile filename
---  let inputs = lines contents
---  let outputs = map (boolToYesNo . isBalanced) inputs
---  mapM putStrLn outputs
+
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  --let outputs = map (boolToYesNo . isBalanced) inputs
+  print $ realizations $ pack (head inputs)
+  --mapM_ putStrLn outputs

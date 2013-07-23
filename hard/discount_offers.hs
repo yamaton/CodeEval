@@ -60,10 +60,8 @@ split c s = case dropWhile (== c) s of
   s' -> w : split c s''
 	where (w, s'') = break (== c) s'
 
-
 perm :: Int -> [a] -> [[a]]
 perm n xs = concatMap permutations $ combinations n xs
-
 
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
@@ -77,7 +75,6 @@ combinations n xs
 						 ++ combinations k zs
 		| k == l    = [ys]
 		| otherwise = []    
-
 
 suitabilityScore :: String -> String -> Double
 suitabilityScore customers products

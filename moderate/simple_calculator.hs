@@ -45,6 +45,12 @@ E.g 14.132646 gets 14.13265, 14.132644 gets 14.13264, 14.132645 gets 14.13265.
 If output number has less than 5 digits after the dot you don't need to add zeros. 
 E.g. you need to print 16.34 (and not 16.34000) in case the answer is 16.34. 
 And you need to print 16 (and not 16.00000) in case the answer is 16.
+
+
+
+[Comment]
+Shunting yard algorithm to convert from infix to reverse polish notation
+http://en.wikipedia.org/wiki/Shunting-yard_algorithm
 -}
 
 import System.Environment (getArgs)
@@ -63,4 +69,3 @@ main = do
     let inputs = map read $ lines contents
     let outputs = map calculate inputs
     mapM_ (putStrLn . formatter) outputs
-

@@ -23,28 +23,18 @@ False
 -}
 
 import System.Environment (getArgs)
+import Control.Monad (foldM)
 
-PAIRS = {')': '(', '}': '{', ']': '['}
-
-
-def if_valid_parenthesis(s):
-    stack = []
-    for c in s:
-        if c in "({[":
-            stack.append(c)
-        else:
-            try:
-                if stack[-1] == PAIRS[c]:
-                    stack.pop()
-                else:
-                    return False
-            except IndexError:
-                return False
-    return len(stack) == 0
 
 isValidParenthesis :: String -> Bool
-
-
+isValidParenthesis s = (foldM helper "" s) == Just ""
+  where
+    helper :: String -> Char -> Maybe String
+    helper   ""      c   = if c `elem` "({[" then Just (c:[]) else Nothing
+    helper (s:stack) ')' = if s == '(' then Just stack else Nothing
+    helper (s:stack) '}' = if s == '{' then Just stack else Nothing    
+    helper (s:stack) ']' = if s == '[' then Just stack else Nothing    
+    helper   stack   c   = Just (c:stack)
 
 
 main = do 
@@ -52,5 +42,5 @@ main = do
     contents <- readFile f
     let inputs = lines contents
     let outputs = map isValidParenthesis inputs
-    mapM print outputs
+    mapM_ print outputs
 

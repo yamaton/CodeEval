@@ -1,7 +1,8 @@
 {-
-prefix.hs
-
-Created by Yamato Matsuoka on 2013-07-12.
+Prefix Expressions
+===================
+Updated by Yamato Matsuoka on 2013-07-23
+Created by Yamato Matsuoka on 2013-07-12
 
 Description
 ------------
@@ -29,25 +30,15 @@ Better data structure needed to remove these unnecessary conversions.
 -}
 
 import System.Environment (getArgs)
-import Data.Char (isNumber)
-
-interpret :: String -> (Int -> Int -> Int)
-interpret "+" = (+)
-interpret "-" = (-)
-interpret "*" = (*)
-interpret "/" = div
 
 evaluate :: [String] -> Int
-evaluate xs = helper (reverse xs) [] where
-  helper :: [String] -> [String] -> Int
-  helper [] stack      = read (head stack)
-  helper (y:ys) stack
-    | isHeadNumber     = helper ys (y:stack)
-    | otherwise        = helper ys (out:(drop 2 stack))
-      where
-        isHeadNumber = all isNumber y
-        [n1, n2] = take 2 stack
-        out = show $ (interpret y) (read n1) (read n2)
+evaluate xs = head $ foldl helper [] (reverse xs) where
+  helper :: [Int] -> String -> [Int]
+  helper (x:y:ys) "+" = (x + y) : ys
+  helper (x:y:ys) "-" = (x - y) : ys
+  helper (x:y:ys) "*" = (x * y) : ys
+  helper (x:y:ys) "/" = (x `div` y) : ys
+  helper xs numString = (read numString) : xs
 
 main = do
   f:_ <- getArgs
@@ -55,4 +46,3 @@ main = do
   let inputs = map words $ lines contents
   let outputs = map evaluate inputs
   mapM_ print outputs
-

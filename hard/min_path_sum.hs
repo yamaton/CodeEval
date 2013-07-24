@@ -43,14 +43,19 @@ helper matrix i j
       isOutside p q = p < 0 || q < 0 || p >= n || q >= n 
       isTopLeft p q = p == 0 && q == 0
 
+
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
   "" -> []
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
 
+
 reader :: [String] -> [[[Int]]]
-reader xs = undefined
+reader [] = []
+reader (x:xs) = [map read ss | ss <- map (split ',') former] : reader latter
+  where
+    (former, latter) = splitAt (read x) xs
 
 
 main = do 

@@ -29,3 +29,22 @@ True
 
 import System.Environment (getArgs)
 
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
+
+decomposeURI :: String -> [String]
+decomposeURI = undefined
+
+isEquivalentURI :: String -> String -> Bool
+isEquivalentURI = undefined
+
+
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map (split ';') $ lines contents
+  let outputs = [isEquivalentURI s1 s2 | [s1, s2] <- inputs]
+  mapM_ print outputs

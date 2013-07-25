@@ -50,15 +50,20 @@ Print out the number of expressions that evaluate to an ugly number for each tes
 -}
 
 import System.Environment (getArgs)
-import Control.Monad (replicateM, ap)
+import Control.Monad (replicateM, ap, foldM)
 
 -- |
 -- >>> genNumbers [1,2,3]
 -- [6,2,0,-4]
 genNumbers :: [Int] -> [Int]
 genNumbers []     = []
+--genNumbers (x:xs) = 
+--  foldM (\n k -> [n + k, n - k]) x xs
+
+---- Slightly faster
 genNumbers (x:xs) = 
   foldl (\acc n -> ap [(+n), \i -> i-n] acc) [x] xs
+
 
 -- |
 -- >>> concatComb "abc"
@@ -68,18 +73,27 @@ concatComb s = foldr helper [[""]] s
   where 
     helper :: Char -> [[String]] -> [[String]]
     helper c [[""]] = [[[c]]]
-    helper c xxs = ap [(f c), (g c)] xxs
+    helper c xxs = ap [f c, g c] xxs
     f c (ss:yss) = (c:ss) : yss
     g c yss = [c] : yss
 
+---- slightly slower
+--concatComb s = map words $ foldr helper [""] s
+--  where 
+--    helper :: Char -> [String] -> [String]
+--    helper c [""] = [c:[]] 
+--    helper c xxs  = ap [(c: ), f c] xxs
+--      where f cc ss = cc : ' ' : ss
+
+
 -- |
 -- >>> strToNumber [["123"], ["12", "3"], ["1", "23"], ["1", "2", "3"]]
--- [[123], [12,3], [1,23], [1,2,3]]
-strToNum :: [[String]] -> [[Int]]
+-- [[123],[12,3],[1,23],[1,2,3]]
+strToNumber :: [[String]] -> [[Int]]
 strToNumber xxs = [map read xs | xs <- xxs]
 
 countUgly :: String -> Int
-countUgly s = length $ filter isUgly $ concatMap genNumbers $ (strToNum . concatComb) s
+countUgly s = length $ filter isUgly $ concatMap genNumbers $ (strToNumber . concatComb) s
 
 isUgly :: Int -> Bool
 isUgly n = any divisible [2,3,5,7]

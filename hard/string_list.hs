@@ -34,7 +34,7 @@ import Control.Monad (replicateM)
 import Data.List (intercalate, nub, sort)
 
 combinationsWithReplacement :: Ord a => Int -> [a] -> [[a]]
-combinationsWithReplacement n xs = sort . nub $ replicateM n xs
+combinationsWithReplacement n xs = sort $ replicateM n (nub xs)
 
 reader :: String -> (Int, String)
 reader s = (read former, latter)

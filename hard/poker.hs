@@ -46,65 +46,50 @@ right
 -}
 
 import System.Environment (getArgs)
+import Data.List (sort, elemIndex)
 
-type Hand -> [String]
+type Hand = [String]
+type Rank = Int
 
 poker :: Hand -> Hand -> String
 poker hand1 hand2 =
   | length outcome > 1    = "none"
   | head outcome == hand1 = "left"
   | otherwise             = "right"
-    where outcome = allMax handRank hand1 hand2
+    where outcome = allMax handrank hand1 hand2
 
-allMax :: Ord a => [a] -> 
+allMax :: Ord a => (Hand -> Int) -> [Hand] -> [Hand]
+allMax rank xs = filter (==oneMax) xs
+  where oneMax = last $ sortWith rank xs
 
+handRank :: Hand -> (Rank, [Rank])
+  | isStraight ranks && isFlush hand  = (8, [max ranks])
+  | isKind 4 ranks                    = (7, [kind 4 ranks, kind 1 ranks]) 
+  | isJust (kind 3 ranks) && 
+    isJust (kind 2 ranks)             = (6, [fromJust (kind 3 ranks), fromJust (kind 2 ranks)])
+  | isFlush hand                      = (5, ranks)
+  | isStraight ranks                  = (4, [max ranks])
+  | isJust (kind 3 ranks)             = (3, fromJust (kind 3 ranks) : ranks)
+  | isTowPair ranks                   = (2, (twoPair ranks) ++ ranks)
+  | isKind 2 ranks                    = (1, kind 2 ranks : ranks)
+  | otherwise                         = (0, ranks)
+    where ranks = cardRanks hand
 
-def allmax(iterable, key=None):
-    "Return a list of all items equal to the max of the iterable."
-    onemax = max(iterable, key=key)
-    key = key or (lambda x: x)
-    return [x for x in iterable if key(x) == key(onemax)]
+cardRanks :: Hand -> [Rank]
+cardRanks hand = [5,4,3,2,1] if ranks == [14,5,4,3,2] else ranks
+  where reverse . sort  $ map (fromJust . (`elemIndex` "--23456789TJQKA") . head) hand
 
+isFlush :: Hand -> Bool
+isFlush hand = length (nub suits) == 1
+  where suits = map last hand
 
-def hand_rank(hand):
-    "Return a value indicating the ranking of a hand."
-    ranks = card_ranks(hand)
-    if straight(ranks) and flush(hand):
-        return (8, max(ranks))
-    elif kind(4, ranks):
-        return (7, kind(4, ranks), kind(1, ranks))
-    elif kind(3, ranks) and kind(2, ranks):
-        return (6, kind(3, ranks), kind(2, ranks))
-    elif flush(hand):
-        return (5, ranks)
-    elif straight(ranks):
-        return (4, max(ranks))
-    elif kind(3, ranks):
-        return (3, kind(3, ranks), ranks)
-    elif two_pair(ranks):
-        return (2, two_pair(ranks), ranks)
-    elif kind(2, ranks):
-        return (1, kind(2, ranks), ranks)
-    else:
-        return (0, ranks)
+isStraight :: Ranks -> Bool
+isStraight ranks = maximum ranks - minimum ranks == 4 && length (nub ranks) == 5 
 
+kind :: Int -> [Rank] -> Maybe [Rank]
 
-def card_ranks(hand):
-    "Return a list of the ranks, sorted with higher first."
-    ranks = ['--23456789TJQKA'.index(r) for r, s in hand]
-    ranks.sort(reverse=True)
-    return [5, 4, 3, 2, 1] if (ranks == [14, 5, 4, 3, 2]) else ranks
+twoPair :: [Rank] -> Maybe [Rank]
 
-
-def flush(hand):
-    "Return True if all the cards have the same suit."
-    suits = [s for (r, s) in hand]
-    return len(set(suits)) == 1
-
-
-def straight(ranks):
-    "Return True if the ordered ranks form a 5-card straight."
-    return (max(ranks) - min(ranks) == 4) and len(set(ranks)) == 5
 
 
 def kind(n, ranks):

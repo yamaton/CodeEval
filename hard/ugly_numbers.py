@@ -112,7 +112,7 @@ def _count_ugly(seq):
     result = []
     for operators in tuples((op.add, op.sub), N-1):
         ## Deque is faster than list given by "stack = s[:]"
-        stack = collections.deque(sq) 
+        stack = collections.deque(seq) 
         for f in operators:
             x1 = stack.pop()
             x2 = stack.pop()
@@ -144,10 +144,8 @@ def test():
     print "passed all tests!"
 
 if __name__ == '__main__':
-    test()
-    # with open(sys.argv[1], "r") as f:
-    #     data = [s.rstrip() for s in f if s.rstrip()]
-    # out = (count_ugly_numbers(s) for s in data)
-    # print "\n".join(str(i) for i in out)
-
-
+    # test()
+    with open(sys.argv[1], "r") as f:
+        data = [s.rstrip() for s in f if s.rstrip()]
+    out = (count_ugly_numbers(s) for s in data)
+    print "\n".join(str(i) for i in out)

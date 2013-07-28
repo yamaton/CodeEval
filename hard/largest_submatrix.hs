@@ -36,24 +36,48 @@ Print out the sum of elements for the largest sub-matrix. For the given input it
 -}
 
 import System.Environment (getArgs)
-type :: Matrix = Int -> Int -> Int
+import Control.Monad (replicateM)
+import Data.List (transpose, sort)
 
+type Matrix = [[Int]]
+
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
+combinations _ [] = []
+combinations n xs  
+  | n == 1    = map (:[]) xs 
+  | otherwise = helper n (length xs) xs    
+    where
+      helper k l ys@(z:zs)        
+        | k < l     = map (z :) (combinations (k-1) zs)
+                         ++ combinations k zs
+        | k == l    = [ys]
+        | otherwise = []
+
+-- |
+-- >>> integralTransform [[1,2,3],[4,5,6],[7,8,9]]
+-- [[1,3,6],[5,12,21],[12,27,45]]
 integralTransform :: Matrix -> Matrix
-integralTransform mat = [[(sum . concat . (take j) . transpose . (take i))  mat | j <- [1..n]] | i <- [1..n]]
-  where n = length mat
+integralTransform = transpose . (map (scanl1 (+))) . transpose . (map (scanl1 (+)))
 
-largestSubmatrix :: Matrix -> Int
-largestSubMatrix mat = last . sort $ [subMatrixSum xL xH yL yH | [xL, xH, yL, yH] <- genIndices]
+-- |
+-- 
+largestSubMatrix :: Matrix -> Int
+largestSubMatrix mat = maximum [subMatrixSum xL xH yL yH | [xL, xH, yL, yH] <- genIndices n]
   where
     n = length mat
-    integMat = integralTransform mat
-    subMatrixSum xL xH yL yH = integMat xH yH - integMat xH yL - integMat xL yH + integMat xL yL
+    table = integralTransform mat
+    subMatrixSum xL xH yL yH = table !! xH !! yH + table !! xL !! yL - table !! xH !! yL - table !! xL !! yH
 
+-- |
+-- >>> genIndices 3
+-- [[0,1,0,1],[0,1,0,2],[0,1,1,2],[0,2,0,1],[0,2,0,2],[0,2,1,2],[1,2,0,1],[1,2,0,2],[1,2,1,2]]
+genIndices :: Int -> [[Int]]
+genIndices n = map concat $ replicateM 2 $ combinations 2 [0..(n-1)]
 
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let input = [map read (words line) | line <- lines contents]
-  let output = largestSubMatrix input
-  print output
+  print $ largestSubMatrix input

@@ -47,34 +47,35 @@ import System.Environment (getArgs)
 import Data.Text (pack, unpack, count, splitOn, append, Text)
 import Control.Applicative ((<$>), (<*>))
 
---isBalanced :: String -> Bool
---isBalanced "" = True
---isBalanced s
---  | any (`notElem` allowed) s = False
---  | otherwise                 = any isBalancedProperly (realizations (pack s))
---    where 
---      allowed = ['a' .. 'z'] ++ "(): "
+isBalanced :: String -> Bool
+isBalanced "" = True
+isBalanced s
+  | any (`notElem` allowed) s = False
+  | otherwise                 = any isBalancedProperly (realizations (pack s))
+    where 
+      allowed = ['a' .. 'z'] ++ "(): "
+
 
 realizations :: Text -> [Text] 
-realizations text = zs
+realizations text = concatMap (\(x:xs) -> foldl (\acc txt -> append <$> acc <*> [txt, frown `append` txt]) [x] xs) xxs
   where 
     [smile, frown] = map pack [":)", ":("]
-    subTxt   = splitOn smile text :: [Text]
-    textList  = foldl (\acc txt -> append <$> acc <*> [txt, smile `append` txt]) [head subTxt] (tail subTxt) :: [Text]
+    (y:ys) = splitOn smile text :: [Text]
+    textList  = foldl (\acc txt -> append <$> acc <*> [txt, smile `append` txt]) [y] ys :: [Text]
     xxs = map (splitOn frown) textList :: [[Text]]
-    zs = map (foldl1 (\acc txt -> append <$> acc <*> [txt, frown `append` txt])) xxs :: [Text]
 
---isBalancedProperly :: Text -> Bool
---isBalancedProperly text = isAllowed && isBalanced
---  where 
---    helper :: Int -> Char -> Int
---    helper acc '(' = acc + 1
---    helper acc ')' = acc - 1
---    helper acc _   = acc
---    s = unpack text    
---    stack = scanl helper 0 s :: [Int]
---    isBalanced = last stack == 0
---    isAllowed  = all (>= 0) stack
+
+isBalancedProperly :: Text -> Bool
+isBalancedProperly text = isAllowed && isBalanced
+  where 
+    helper :: Int -> Char -> Int
+    helper acc '(' = acc + 1
+    helper acc ')' = acc - 1
+    helper acc _   = acc
+    s = unpack text    
+    stack = scanl helper 0 s :: [Int]
+    isBalanced = last stack == 0
+    isAllowed  = all (>= 0) stack
 
 boolToYesNo :: Bool -> String
 boolToYesNo True  = "YES"
@@ -85,6 +86,6 @@ main = do
   f:_ <- getArgs
   contents <- readFile f
   let inputs = lines contents
-  --let outputs = map (boolToYesNo . isBalanced) inputs
-  print $ realizations $ pack (head inputs)
-  --mapM_ putStrLn outputs
+  let outputs = map (boolToYesNo . isBalanced) inputs
+  --print $ realizations $ pack (head inputs)
+  mapM_ putStrLn outputs

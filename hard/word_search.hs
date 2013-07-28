@@ -32,15 +32,42 @@ True
 
 -}
 import System.Environment (getArgs)
+import Data.List (elemIndices)
+
+type Position = (Int, Int)
 
 searchWord :: [String] -> String -> Bool
-searchWord field word = undefined
+searchWord field (w:word) = or [isReachable field start word | start <- findStartPos field w]
 
+isReachable :: Eq a => [[a]] -> Position -> [a] -> Bool
+isReachable field pos x = helper [pos] x
+  where
+    helper _ [] = True
+    helper ((i,j):past) (x:xs) = 
+      or [ helper (p:(i,j):past) xs |
+             p <- allowed field [(i-1,j),(i+1,j),(i,j-1),(i,j+1)], 
+             p `notElem` past,
+             (field `at` p) == x ] 
+    helper [] _ = error "something wrong!"
+
+at :: [[a]] -> Position -> a
+at field (i,j) = field !! i !! j
+
+allowed :: [[a]] -> [Position] -> [Position]
+allowed field xs = filter conditions xs
+  where rows = length field
+        cols = length $ head field
+        conditions = \(i, j) -> (0 <= i && i < rows && 0 <= j && j < cols)
+
+findStartPos :: Eq a => [[a]] -> a -> [Position]
+findStartPos field x = map (\n -> (n `div` cols, n `mod` cols)) flatIndices
+  where cols = length (head field)
+        flatIndices = elemIndices x (concat field)
 
 main = do
   f:_ <- getArgs
   contents <- readFile f
   let inputs = lines contents
-  let grid = ["ABCE","SFCS","ADEE"]
-  let outputs = map (searchWord grid) inputs
+  let field = ["ABCE","SFCS","ADEE"]
+  let outputs = map (searchWord field) inputs
   mapM_ print outputs

@@ -54,69 +54,91 @@ http://en.wikipedia.org/wiki/Shunting-yard_algorithm
 
 import System.Environment (getArgs)
 import Text.Printf (printf)
+import Data.List (isInfixOf)
 import Data.Char (isSpace)
 
 calculate :: String -> Double
-calculate = reversePolishCalc . toRPN . modifier . splitter . (filter (not . isSpace))
+calculate = reversePolishCalc . toRPN . modifier . preModifier . splitter . (filter (not . isSpace))
 
+-- | for unary operation like 3 ^ -2
 modifier :: [String] -> [String]
-modifier xs = 
-  where zs = 
+modifier [] = []
+modifier [x] = [x]
+modifier [x,y] = [x,y]
+modifier (x:"-":y:xs) = if (x `isInfixOf` "^*/+-(")
+                          then x : ('-':y) : modifier xs
+                          else x : modifier ("-":y:xs)
+modifier (x:"+":y:xs) = if (x `isInfixOf` "^*/+-(")
+                          then x : y : modifier xs
+                          else x : modifier ("+":y:xs)                          
+modifier (x:xs) = x : modifier xs
+
+-- | for calculation like  -3 * 3
+preModifier :: [String] -> [String]
+preModifier ("-":xs) = "-1":"*":xs
+preModifier xs       = xs
 
 splitter :: String -> [String]
 splitter ""     = []
-splitter s@(x:xs) = 
+splitter s@(x:xs) 
   | isOperator x = [x] : splitter xs
   | otherwise    = former : splitter latter
   where 
-    isOperator = `elem` "^*/+-()"
+    isOperator = (`elem` "^*/+-()")
     (former, latter) = break isOperator s
+
 
 reversePolishCalc :: [String] -> Double
 reversePolishCalc xs = head $ foldl helper [] xs 
   where
-    helper :: [Int] -> String -> [Int]
+    helper :: [Double] -> String -> [Double]
     helper (x:y:ys) "+" = (y + x) : ys
     helper (x:y:ys) "-" = (y - x) : ys
     helper (x:y:ys) "*" = (y * x) : ys
-    helper (x:y:ys) "/" = (y `div` x) : ys
-    helper (x:y:ys) "^" = (y ^ x) : ys    
+    helper (x:y:ys) "/" = (y / x) : ys
+    helper (x:y:ys) "^" = (y ** x) : ys    
     helper xs numString = (read numString) : xs
 
+
 toRPN :: [String] -> [String]
-toRPN = shuntingYard [] []
+toRPN = reverse . (shuntingYard [] []) 
+
 
 -- Shunting-Yard Algorithm
 shuntingYard :: [String] -> [String] -> [String] -> [String]
-shuntingYard stack []     []   = stack 
-shuntingYard stack (x:xs) []   = shuntingYard x:stack xs []
-shuntingYard stack xs '(':ys   = shuntingYard stack '(':xs ys
-shuntingYard stack x:xs ')':ys
-  | x == '('  = shuntingYard stack   xs   ys
-  | otherwise = shuntingYard x:stack xs ')':ys
-shuntingYard stack x:xs y:ys
-  | y `elem` "^*/+-" = if precedence x < precedence y 
-                        then shuntingYard stack y:xs ys
-                        else shuntingYard x:stack xs y:ys
-  | otherwise       = shuntingYard y:stack x:xs ys
+shuntingYard stack []     []       = stack 
+shuntingYard stack (x:xs) []       = shuntingYard (x:stack) xs []
+shuntingYard stack xs     ("(":ys) = shuntingYard stack ("(":xs) ys
+shuntingYard stack (x:xs) (")":ys)
+  | x == "("  = shuntingYard stack     xs   ys
+  | otherwise = shuntingYard (x:stack) xs (")":ys)
+shuntingYard stack (x:xs) (y:ys)
+  | y `isInfixOf` "^*/+-" = if precedence x < precedence y 
+                              then shuntingYard stack (y:x:xs) ys
+                              else shuntingYard (x:stack) xs (y:ys)
+  | otherwise             = shuntingYard (y:stack) (x:xs) ys
+shuntingYard stack  []  (x:xs) 
+  | x `isInfixOf` "^*/+-(" = shuntingYard  stack [x] xs
+  | otherwise              = shuntingYard (x:stack) []  xs
 
 
-precedence :: Char -> Int
-precedence '^' = 3
-precedence '*' = 2
-precedence '/' = 2
-precedence '+' = 1
-precedence '-' = 1
-precedence '(' = 0 -- Ok to have the loweset precedence because of the special treatment in shuntingYard
+precedence :: String -> Int
+precedence "^" = 3
+precedence "*" = 2
+precedence "/" = 2
+precedence "+" = 1
+precedence "-" = 1
+precedence "(" = 0 -- Ok to have the loweset precedence because of the special treatment in shuntingYard
 
 
 formatter :: Double -> String
-formatter x = reverse $ dropWhile (\c -> c == '0' || c == '.') (reverse s)
+formatter x = reverse $ dropWhile (\c -> c == '.') $ dropWhile (\c -> c == '0') (reverse s)
   where s = printf "%.5f" x
 
+
 main = do 
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs = map read $ lines contents
-    let outputs = map calculate inputs
-    mapM_ (putStrLn . formatter) outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map calculate inputs
+  mapM_ (putStrLn . formatter) outputs

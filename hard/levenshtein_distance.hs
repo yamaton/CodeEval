@@ -15,8 +15,9 @@ Print out how big the social network for the word 'hello' is. e.g. The social ne
 
 [Comment]
 "hello" has 4844 friends (30 sec on GHC, 14 sec on GHC w/ -O2 option)
+because of the simple-minded O(N^2) algorithm.
 
- As expected, the profiler told me that length in `isFriend` is called too many times.
+I think I need to structure word list at first, maybe to N-gram or something similar.
 
  
 -}

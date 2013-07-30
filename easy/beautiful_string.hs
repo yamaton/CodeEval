@@ -39,21 +39,19 @@ Print out the maximum beauty for the string. e.g.
 -}
 
 import System.Environment (getArgs)
-import Data.List (sort, sortBy, group)
+import Data.List (sort, group)
 import Data.Char (toLower, isAlpha)
-import Data.Ord (comparing)
 
 tally :: String -> [(Int, Char)]
-tally s = reverse.sortBy (comparing fst) $ map (\x -> (length x, head x)) groupList
-	where groupList = group $ sort [toLower c | c <- s, isAlpha c]
+tally s = reverse . sort $ map (\x -> (length x, head x)) groupList
+	where groupList = group . sort $ map toLower s
 
 toBeautifulNumber :: String -> Int
 toBeautifulNumber s = sum $ zipWith (*) (map fst $ tally s) [26, 25..]
 
 main = do
-    args <- getArgs
-    let fileName = head args
-    contents <- readFile fileName
-    let inputs = lines contents
-    let outputs = map toBeautifulNumber inputs
-    mapM print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map toBeautifulNumber inputs
+  mapM_ print outputs

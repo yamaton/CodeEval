@@ -30,23 +30,20 @@ import Data.List (intercalate, intersect)
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
-                "" -> []
-                s' -> w : split c s''
-                    where (w, s'') = break (== c) s'
+  "" -> []
+  s' -> w : split c s''
+      where (w, s'') = break (== c) s'
 
 join :: Char -> [Int] -> String
-join c xs = intercalate (c:[]) $ map show xs
-
+join c xs = intercalate [c] $ map show xs
 
 parseLine :: String -> ([Int], [Int])
 parseLine s = (map read former, map read latter) 
-    where [former, latter] = (map (split ',') $ split ';' s)  :: [[String]]
+  where [former, latter] = map (split ',') $ split ';' s
 
 main = do
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = map parseLine $ lines contents
-    let outputs = [intersect xs ys | (xs, ys) <- inputs]
-    mapM putStrLn $ map (join ',') outputs
-
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map parseLine $ lines contents
+  let outputs = [intersect xs ys | (xs, ys) <- inputs]
+  mapM_ (putStrLn . join ',') outputs

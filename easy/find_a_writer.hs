@@ -33,14 +33,14 @@ import System.Environment (getArgs)
 
 reader :: String -> (String, [Int])
 reader s = (former, map read (words latter))
-  where (former, (_:latter)) = break (== '|') s
+  where (former, _:latter) = break (== '|') s
 
 decoder :: String -> [Int] -> String
-decoder s xs = map (\n -> s !! (n-1)) xs
+decoder s = map (\n -> s !! (n-1))
 
 main = do 
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs = map reader $ filter (not . null) $ lines contents 
-    let outputs = [decoder s xs | (s, xs) <- inputs]
-    mapM_ putStrLn outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map reader $ filter (not . null) $ lines contents 
+  let outputs = [decoder s xs | (s, xs) <- inputs]
+  mapM_ putStrLn outputs

@@ -36,7 +36,7 @@ split c s = case dropWhile (== c) s of
     where (w, s'') = break (== c) s'
 
 wordToDigit :: [String] -> String
-wordToDigit xs = map helper xs
+wordToDigit = map helper
   where
     helper :: String -> Char
     helper "zero"  = '0'

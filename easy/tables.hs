@@ -23,6 +23,6 @@ Print out the table in a matrix like fashion, each number formatted to a width o
 import Text.Printf (printf)
 
 main = do 
-    let table = [[i * j | i <- [1 .. 12]] | j <- [1 .. 12]] :: [[Int]]
-    let output = [concat [printf "%4d" n | n <- line] | line <- table]
-    mapM (putStrLn . (drop 2)) output
+  let table = [[i * j | i <- [1 .. 12]] | j <- [1 .. 12]] :: [[Int]]
+  let output = [concat [printf "%4d" n | n <- line] | line <- table]
+  mapM_ (putStrLn . drop 2) output

@@ -30,24 +30,20 @@ import System.Environment (getArgs)
 import Data.List (intercalate)
 
 fizzbuzz :: Int -> Int -> Int -> [String]
-fizzbuzz p q n = map (fizzbuzzHelper p q) [1 .. n]
-
-fizzbuzzHelper :: Int -> Int -> Int -> String
-fizzbuzzHelper p q i
-    | i `mod` p == 0 && i `mod` q == 0 = "FB"
-    | i `mod` p == 0                   = "F"
-    | i `mod` q == 0                   = "B"
-    | otherwise                        = show i
+fizzbuzz p q n = map fizzbuzzHelper [1 .. n]
+  where
+    fizzbuzzHelper i
+      | i `mod` p == 0 && i `mod` q == 0 = "FB"
+      | i `mod` p == 0                   = "F"
+      | i `mod` q == 0                   = "B"
+      | otherwise                        = show i
 
 join :: Char -> [String] -> String
-join c s = intercalate (c:[]) s
+join c = intercalate [c]
 
 main = do
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = [[read w | w <- (words line)] | line <- (lines contents)] :: [[Int]]
-    let outputs = [fizzbuzz p q n| [p, q, n] <- inputs]
-    let outputs' = map (join ' ') outputs
-    mapM putStrLn outputs'
-
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = [map read (words line) | line <- lines contents]
+  let outputs = [fizzbuzz p q n| [p, q, n] <- inputs]
+  mapM_ (putStrLn . unwords) outputs

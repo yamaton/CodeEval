@@ -29,18 +29,16 @@ import Data.List (nub, intercalate)
 -- modified: http://stackoverflow.com/questions/4978578/how-to-split-a-string-in-haskell
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
-                "" -> []
-                s' -> w : split c s''
-                    where (w, s'') = break (== c) s'
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
 join :: Char -> [String] -> String
-join c s = intercalate (c:[]) s
+join c = intercalate [c]
 
 main = do 
-    args <- getArgs
-    let fileName = head args
-    contents <- readFile fileName
-    let inputs = map (split ',') $ lines contents
-    let outputs = map nub inputs
-    mapM (putStrLn . (join ',')) outputs
-
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map (split ',') $ lines contents
+  let outputs = map nub inputs
+  mapM_ (putStrLn . join ',') outputs

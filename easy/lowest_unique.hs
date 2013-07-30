@@ -38,7 +38,7 @@ tally xs = sort $ toList $ fromListWith (+) [(x, 1)| x <- xs]
 
 lowestUniqueIdx :: [Int] -> Int
 lowestUniqueIdx xs = 
-    if (null singleAppearences) 
+    if null singleAppearences
         then 0 
         else let n = (fst . head) singleAppearences
              in (fromJust $ elemIndex n xs) + 1  -- count from 1

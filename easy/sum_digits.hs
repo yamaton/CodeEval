@@ -27,15 +27,14 @@ Print to stdout, the sum of the numbers that make up the integer, one per line. 
 import System.Environment (getArgs)
 
 integerDigits :: Int -> [Int]
-integerDigits n = reverse $ map (`mod` 10) $ takeWhile (> 0) $ iterate (`div` 10) n
+integerDigits n = map (read . (:[])) (show n)
 
 sumDigits :: Int -> Int
 sumDigits = sum . integerDigits
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = map read $ lines contents
-    let outputs = map sumDigits inputs
-    mapM print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map read $ lines contents
+  let outputs = map sumDigits inputs
+  mapM print outputs

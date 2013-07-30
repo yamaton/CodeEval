@@ -22,12 +22,12 @@ Print out the number of ways to climb to the top of the staircase. e.g.
 ```
 -}
 import System.Environment (getArgs)
-import Control.Monad (forM)
+import Control.Monad (forM_)
 import Control.Monad.State (evalState, get, put)
 
 fibonacci :: Int -> Int
 fibonacci n = flip evalState (0,1) $ do
-  forM [0 .. (n-1)] $ \_ -> do
+  forM_ [0 .. (n-1)] $ \_ -> do
     (a, b) <- get
     put (b, a + b)
   (a, b) <- get

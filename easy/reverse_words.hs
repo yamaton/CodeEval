@@ -27,12 +27,8 @@ CodeEval Hello
 import System.Environment (getArgs)
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = lines contents
-    let outputs = map (reverse.words) inputs
-    mapM putStrLn (map unwords outputs)
-
-
-
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map (reverse.words) inputs
+  mapM_ (putStrLn . unwords) outputs

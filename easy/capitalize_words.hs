@@ -24,14 +24,12 @@ import System.Environment
 import Data.Char (toUpper)
 
 capitalize :: String -> String
-capitalize s = unwords $ map capitalizeHelper ws
-    where capitalizeHelper w = (toUpper (head w)) : (tail w)
-          ws = words s
+capitalize s = unwords $ map capitalizeHelper $ words s
+  where capitalizeHelper (w:ws) = toUpper w : ws
 
 main = do 
-    args <- getArgs
-    let fileName = head args
-    contents <- readFile fileName
-    let inputs = lines contents
-    let outputs = map capitalize inputs
-    mapM putStrLn outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map capitalize inputs
+  mapM_ putStrLn outputs

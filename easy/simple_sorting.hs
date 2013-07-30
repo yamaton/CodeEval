@@ -29,11 +29,8 @@ myCompare :: String -> String -> Ordering
 myCompare s1 s2 = compare (read s1 :: Float) (read s2 :: Float)
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = [words line | line <- lines contents]
-    let outputs = [sortBy myCompare nums | nums <- inputs]
-    mapM putStrLn (map unwords outputs)
-
-
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = [words line | line <- lines contents]
+  let outputs = [sortBy myCompare nums | nums <- inputs]
+  mapM_ (putStrLn . unwords) outputs

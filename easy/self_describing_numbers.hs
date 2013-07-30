@@ -39,8 +39,8 @@ integerDigits n = reverse . map (`mod` 10) $ takeWhile (> 0) $ iterate (`div` 10
 
 isSelfDescribing :: Int -> Bool
 isSelfDescribing n = xs == ys
-            where xs = integerDigits n
-                  ys = map (\x -> count x xs) [0 .. (length xs - 1)]
+  where xs = integerDigits n
+        ys = map (\x -> count x xs) [0 .. (length xs - 1)]
 
 boolToInt :: Bool -> Int
 boolToInt True = 1

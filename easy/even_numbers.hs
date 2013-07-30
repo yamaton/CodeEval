@@ -24,15 +24,13 @@ All numbers in input are integers > 0 and < 5000.
 
 import System.Environment (getArgs)
 
-isEven :: Int -> Int
-isEven n
-    | even n    = 1
-    | otherwise = 0
+boolToInt :: Bool -> Int
+boolToInt True  = 1
+boolToInt False = 0
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = map read $ lines contents
-    let outputs = map isEven inputs
-    mapM print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map read $ lines contents
+  let outputs = map (boolToInt . even) inputs
+  mapM_ print outputs

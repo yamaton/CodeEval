@@ -28,13 +28,12 @@ import System.Environment (getArgs)
 import Numeric (readHex)
 
 hexToDec :: String -> Int
-hexToDec s = (fst . head) readHex s
+hexToDec s = fst . head $ readHex s
 
 main = do
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = lines contents
-    let outputs = map hexToDec inputs
-    mapM print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map hexToDec inputs
+  mapM_ print outputs
     

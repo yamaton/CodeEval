@@ -26,30 +26,26 @@ Print out the zero based position of the character 't' in string 'S', one per li
 -}
 
 import System.Environment (getArgs)
-import Data.List (findIndices)
+import Data.List (elemIndices)
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
-    "" -> []
-    s' -> w : split c s''
-        where (w, s'') = break (== c) s'
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
 parser :: String -> (String, Char)
-parser s = let [s1, c:[]] = split ',' s
+parser s = let [s1, c:_] = split ',' s
            in (s1, c)
 
 
 getLastIndex :: Char -> String -> Int
-getLastIndex c s = if (null xs) then (-1) else (last xs)
-                       where xs = findIndices (== c) s
+getLastIndex c s = if null xs then (-1) else last xs
+  where xs = elemIndices c s
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = map parser $ lines contents
-    let outputs = [getLastIndex c s| (s, c) <- inputs]
-    mapM print outputs
-
-
-    
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map parser $ lines contents
+  let outputs = [getLastIndex c s| (s, c) <- inputs]
+  mapM_ print outputs

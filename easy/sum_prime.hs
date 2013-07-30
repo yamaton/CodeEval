@@ -20,6 +20,5 @@ Your program should print the sum on stdout.i.e.
 
 primes :: [Int]
 
-main = do 
-    print $ sum (take 1000 primes)
+main = print $ sum (take 1000 primes)
 

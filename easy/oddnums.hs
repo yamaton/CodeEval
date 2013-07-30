@@ -16,5 +16,5 @@ Output sample
 Print the odd numbers from 1 to 99, one number per line.
 -}
 
-main = mapM print [1, 3..99]
+main = mapM_ print [1, 3..99]
 

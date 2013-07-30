@@ -1,6 +1,6 @@
 {-
-spiral_printing.hs
-
+Spiral Printing
+===============
 Created by Yamato Matsuoka on 2013-07-12.
 
 Input sample
@@ -22,74 +22,47 @@ Print out the matrix in clockwise fashion, one per line, space delimited. eg.
 import System.Environment (getArgs)
 
 
-def reshape(seq, rows, cols):
-    """
-    This is numpy equivalent of reshape.
-    row * col == len(seq) must be required.
-    """
-    if len(seq) != rows * cols:
-        raise ValueError("row and column size are invalid.")
-    return [seq[i*cols:(i+1)*cols] for i in range(rows)]
-    
+reshapeBy :: Int -> [a] -> [[a]]
+reshapeBy n xs = 
+  case splitAt n xs of
+    ([], _)  -> []
+    (ys,zs)  -> ys : reshapeBy n zs
 
-def spiral(seq, rows, cols):
-    matrix = reshape(seq, rows, cols)
-    delta = [[0, 1], [1, 0], [0, -1], [-1, 0]]
-    maxX, maxY = rows, cols
-    numbers = maxX * maxY
-    
-    x, y = 0, 0
-    idx = 0
-    result = [matrix[x][y]]
-    while len(result) < numbers:
-        next_x = x + delta[idx][0]
-        next_y = y + delta[idx][1]
-        if (0 <= next_x < maxX and 0 <= next_y < maxY 
-                and matrix[next_x][next_y] not in result):
-            x, y = next_x, next_y
-            result.append(matrix[x][y])
-        else:
-            idx = (idx + 1) % len(delta)
-            x += delta[idx][0]
-            y += delta[idx][1]
-            result.append(matrix[x][y])
-    return result
-        
-
-def readdata(text):
-    data = (line.split(";") for line in text.split("\n") if line)
-    data = [(seq.split(), int(rows), int(cols)) for (rows, cols, seq) in data]
-    return data
+split :: Char -> String -> [String]
+split c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : split c s''
+    where (w, s'') = break (== c) s'
 
 
-
-def test():
-    seq = range(1, 7)
-    assert reshape(seq, 3, 2) == [[1, 2], [3, 4], [5, 6]]
-    assert reshape(seq, 2, 3) == [[1, 2, 3], [4, 5, 6]]
-    assert reshape("a b c d e f".split(), 2, 3) == [['a', 'b', 'c'], ['d', 'e', 'f']]    
-    
-    seq = 'abcdef'
-    assert spiral(seq, 3, 2) == ['a', 'b', 'd', 'f', 'e', 'c']
-    seq = range(1,10)
-    assert spiral(seq, 3, 3) == [1, 2, 3, 6, 9, 8, 7, 4, 5]
-    seq = range(1,13)
-    assert spiral(seq, 3, 4) == [1, 2, 3, 4, 8, 12, 11, 10, 9, 5, 6, 7]
-    assert spiral(seq, 4, 3) == [1, 2, 3, 6, 9, 12, 11, 10, 7, 4, 5, 8]
-
-    text = "3;3;1 2 3 4 5 6 7 8 9\n4;3;1 2 3 4 5 6 7 8 9 10 11 12\n"
-    assert readdata(text) == [([str(c) for c in range(1,10)], 3, 3), 
-                              ([str(c) for c in range(1,13)], 4, 3)]
-    print "all test passed"
+spiral :: Int -> Int -> [Int] -> [Int]
+spiral rowN colN numbers = helper [(0,0)] 0
+  where
+    matrix = reshapeBy colN numbers
+    delta = cycle [(0,1), (1,0), (0,-1), (-1,0)]
+    helper :: [(Int,Int)] -> Int -> [Int]
+    helper path@((x,y):past) deltaIx
+      | (x, y) `elem` past = [matrix !! i !! j | (i, j) <- reverse past]
+      | isKeepGoing       = helper ((newX,newY):path)   deltaIx
+      | otherwise         = helper (nextPos:path) (deltaIx + 1)
+        where
+          (dx, dy)= delta !! deltaIx
+          (newX,newY) = (x + dx, y + dy)
+          (dx', dy') = delta !! (deltaIx + 1)
+          nextPos = (x + dx', y + dy')
+          isKeepGoing = (0 <= newX) && (newX < rowN) && (0 <= newY) && (newY < colN) &&
+                        (newX, newY) `notElem` past
 
 
+reader :: String -> ((Int, Int), [Int])
+reader s = ((read s1, read s2), map read (words xs))
+  where [s1, s2, xs] = split ';' s
 
-if __name__ == '__main__':
-    # test()
-    with open(sys.argv[1], "r") as f:
-        data = readdata(f.read())
-    
-    result = [spiral(seq, rows, cols) for (seq, rows, cols) in data]
-    for row in result:
-        print " ".join(row)
+
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map reader $ lines contents
+  let outputs = [spiral rowN colN numbers | ((rowN, colN), numbers) <-  inputs]
+  mapM_ putStrLn $ [unwords (map show xs)| xs <- outputs]
 

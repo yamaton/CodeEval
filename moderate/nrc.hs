@@ -34,5 +34,5 @@ main = do
     contents <- readFile (head args)
     let inputs = lines contents
     let outputs = map nonRepeatedChar inputs
-    mapM putStrLn $ map (\c -> c:[]) outputs
+    mapM_ (putStrLn . (:[])) outputs
 

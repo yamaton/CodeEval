@@ -30,18 +30,14 @@ Hello World
 -}
 
 import System.Environment (getArgs)
-import Data.List (sortBy)
-import Data.Ord (comparing)
+import GHC.Exts (sortWith)
 
 parser :: [String] -> (Int, [String])
-parser xs = (read (head xs), (tail xs))
+parser xs = (read (head xs), tail xs)
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
-    let (n, inputs) = parser $ lines contents
-    let outputs = take n $ reverse $ sortBy (comparing length) inputs
-    mapM putStrLn outputs
-        
-
-
+  args <- getArgs
+  contents <- readFile (head args)
+  let (n, inputs) = parser $ lines contents
+  let outputs = take n $ reverse $ sortWith length inputs
+  mapM_ putStrLn outputs

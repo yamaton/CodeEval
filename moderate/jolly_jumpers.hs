@@ -28,7 +28,7 @@ import Data.List (sort)
 isJolly :: [Int] -> Bool
 isJolly xs
     | n == 1    = True
-    | otherwise = [1 .. (n-1)] == (sort $ map abs $ zipWith (-) (tail xs) (init xs))
+    | otherwise = [1 .. (n-1)] == (sort . map abs $ zipWith (-) (tail xs) (init xs))
         where n = length xs
 
 boolToJolly :: Bool -> String

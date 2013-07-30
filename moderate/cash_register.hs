@@ -66,7 +66,7 @@ import Data.List (intercalate, sort)
 -- without using `lookupLE`
 countBillAndCoins :: Int -> [String]
 countBillAndCoins 0    = []
-countBillAndCoins cent = name : (countBillAndCoins (cent - amount))
+countBillAndCoins cent = name : countBillAndCoins (cent - amount)
   where
     dict = [(10000, "ONE HUNDRED"), (5000, "FIFTY"), (2000, "TWENTY"), 
          (1000, "TEN"), (500, "FIVE"), (200, "TWO"), (100, "ONE"), (50, "HALF DOLLAR"),
@@ -82,7 +82,7 @@ findChange pp ch
   | ppInt == chInt  = "ZERO"
   | otherwise = intercalate "," (countBillAndCoins changeInCent)
     where 
-      [ppInt, chInt] = (map (\x -> round (100 * x)) [pp, ch] :: [Int])
+      [ppInt, chInt] = map (\x -> round (100 * x)) [pp, ch] :: [Int]
       changeInCent = chInt - ppInt
 
 

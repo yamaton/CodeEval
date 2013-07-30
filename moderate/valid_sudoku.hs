@@ -34,7 +34,7 @@ isValidSudoku sudoku = rowCheck && colCheck && blockCheck
     rowCheck = all (\row -> sort row == theSet) sudoku
     colCheck = all (\col -> sort col == theSet) (transpose sudoku)
     chunkRow = reshapeBy n sudoku
-    blocks = concatMap (concat . (reshapeBy n) . transpose) chunkRow
+    blocks = concatMap (concat . reshapeBy n . transpose) chunkRow
     blockCheck = all (\bl -> sort bl == theSet) blocks
 
 

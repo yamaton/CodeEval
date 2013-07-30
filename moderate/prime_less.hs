@@ -43,16 +43,15 @@ primesTo n = 2 : sieve [3,5..n] where
 -- [2,5]
 minus :: Ord a => [a] -> [a] -> [a]
 minus xxs@(x:xs) yys@(y:ys) = 
-  case (compare x y) of 
+  case compare x y of 
     LT -> x : minus  xs  yys
     EQ ->     minus  xs   ys 
     GT ->     minus xxs   ys
 minus xs _  = xs
 
-
 main = do 
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs = map read $ lines contents
-    let outputs = map primesTo inputs
-    mapM_ putStrLn $ [intercalate "," (map show xs) | xs <- outputs]
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map read $ lines contents
+  let outputs = map primesTo inputs
+  mapM_ (putStrLn . intercalate "," . map show) outputs

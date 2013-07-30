@@ -36,18 +36,17 @@ import System.Environment (getArgs)
 
 decode :: String -> Int
 decode s
-    | length s == 0 = 1
-    | length s == 1 = 1
-    | otherwise     = if (0 < x && x < 26)
-                          then (decode (drop 1 s)) + (decode (drop 2 s))
-                          else (decode (drop 1 s))
-                        where x = read (take 2 s)
+  | null s        = 1
+  | length s == 1 = 1
+  | otherwise     = if 0 < x && x < 26
+                      then decode (drop 1 s) + decode (drop 2 s)
+                      else decode (drop 1 s)
+    where x = read (take 2 s)
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
-    let inputs = lines contents
-    let outputs = map decode inputs
-    mapM print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map decode inputs
+  mapM print outputs
 

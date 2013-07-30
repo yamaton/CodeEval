@@ -26,7 +26,7 @@ import System.Environment (getArgs)
 
 isStringRotation :: String -> String -> Bool
 isStringRotation s t
-    | lenS == lenT = t `elem` [latter ++ former | (former, latter) <- map (\n -> splitAt n s) [0 .. lenS]]
+    | lenS == lenT = t `elem` [latter ++ former | (former, latter) <- map (`splitAt` s) [0 .. lenS]]
     | otherwise    = False
         where 
             lenS = length s
@@ -38,8 +38,8 @@ parser s = (former, tail latter)
 
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map parser $ lines contents
     let outputs = [isStringRotation s1 s2 | (s1, s2) <- inputs]
-    mapM print outputs
+    mapM_ print outputs

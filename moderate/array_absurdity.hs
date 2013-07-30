@@ -41,9 +41,8 @@ findDuplicate :: Int -> [Int] -> Int
 findDuplicate n xs = (n-1) - ((n * (n-1) `div` 2) - sum xs) 
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map parser $ filter (not . null) $ lines contents
     let outputs = [findDuplicate n xs | (n, xs) <- inputs]
     mapM print outputs

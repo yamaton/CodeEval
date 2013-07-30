@@ -42,4 +42,4 @@ main = do
     contents <- readFile f
     let inputs = map read $ lines contents
     let outputs = map pascalSequence inputs
-    mapM putStrLn [unwords (map show out) | out <- outputs]
+    mapM_ (putStrLn . unwords . map show) outputs

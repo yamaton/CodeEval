@@ -27,10 +27,10 @@ import Control.Monad (foldM)
 
 
 isValidParenthesis :: String -> Bool
-isValidParenthesis s = (foldM helper "" s) == Just ""
+isValidParenthesis s = foldM helper "" s == Just ""
   where
     helper :: String -> Char -> Maybe String
-    helper   ""      c   = if c `elem` "({[" then Just (c:[]) else Nothing
+    helper   ""      c   = if c `elem` "({[" then Just [c] else Nothing
     helper (s:stack) ')' = if s == '(' then Just stack else Nothing
     helper (s:stack) '}' = if s == '{' then Just stack else Nothing    
     helper (s:stack) ']' = if s == '[' then Just stack else Nothing    

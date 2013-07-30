@@ -35,7 +35,7 @@ split c s = case dropWhile (== c) s of
     s' -> w : split c s'' where (w, s'') = break (== c) s'
 
 join :: Char -> [String] -> String
-join c s = intercalate (c:[]) s
+join c = intercalate [c]
 
 findPairs :: Int -> [Int] -> [(Int, Int)]
 findPairs n xs = out
@@ -44,9 +44,9 @@ findPairs n xs = out
           bag2 = filter (> nHalf) xs
           bag3 = filter (== nHalf) xs
           pairs = [(i, j) |  i <- bag1, j <- bag2, i + j  == n]
-          out = if ((length bag3 > 1) && (nHalf * 2 == n)) 
-                    then pairs ++ [(nHalf, nHalf)]
-                    else pairs
+          out = pairs ++ if length bag3 > 1 && nHalf * 2 == n 
+                           then [(nHalf, nHalf)]
+                           else []
 
 parser :: String -> ([Int], Int)
 parser s = (numbers, sumValue)
@@ -63,5 +63,5 @@ main = do
     contents <- readFile (head args)
     let inputs = map parser $ lines contents
     let outputs = [findPairs n xs | (xs, n) <- inputs]
-    mapM putStrLn $ map format outputs
+    mapM_ (putStrLn . format) outputs
 

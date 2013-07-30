@@ -38,5 +38,4 @@ endian =
             (0x04:0x03:0x02:0x01:[]) -> return LittleEndian
             _                        -> error "unknown endian"
 
-main = do
-	print endian
+main = print endian

@@ -35,5 +35,5 @@ main = do
     f:_ <- getArgs
     contents <- readFile f
     let inputs = map reader $ lines contents
-    let outputs = [ filter (\c -> c `notElem` s) text | (text, s) <- inputs]
-    mapM putStrLn outputs
+    let outputs = [filter (`notElem` s) text | (text, s) <- inputs]
+    mapM_ putStrLn outputs

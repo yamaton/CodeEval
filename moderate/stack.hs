@@ -31,9 +31,8 @@ push xs n = n : xs
 
 pushAndPop :: [Int] -> [Int]
 pushAndPop [] = []
-pushAndPop xs = s : (takeEvery 2 stack)
-  where 
-    (s:stack) = foldl push [] xs
+pushAndPop xs = s : takeEvery 2 stack
+  where (s:stack) = foldl push [] xs
 
 takeEvery :: Int -> [a] -> [a]
 takeEvery n xs = case drop (n - 1) xs of
@@ -41,8 +40,8 @@ takeEvery n xs = case drop (n - 1) xs of
     (y:ys) -> y : takeEvery n ys 
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = [map read (words line) | line <- lines contents]
     let outputs = map pushAndPop inputs
-    mapM putStrLn [unwords (map show out) | out <- outputs]
+    mapM_ (putStrLn . unwords) [map show out | out <- outputs]

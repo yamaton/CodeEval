@@ -32,7 +32,7 @@ For each line of input, generate a line of output which is the number of iterati
 import System.Environment (getArgs)
 
 isPalindrome :: Int -> Bool
-isPalindrome n = (s == reverse s) 
+isPalindrome n = s == reverse s 
     where s = show n
 
 -- It's much faster to convert to String than to [Int] to compute palindrome
@@ -41,7 +41,7 @@ reverseAdd n = n + n'
     where n' = (read . reverse . show) n :: Int
 
 chainReveseAdd :: Int -> (Int, Int)
-chainReveseAdd n = (length xs, reverseAdd (last xs))
+chainReveseAdd n = (length xs, if null xs then n else reverseAdd (last xs))
     where xs = takeWhile (not . isPalindrome) (iterate reverseAdd n)
 
 main = do 
@@ -49,5 +49,5 @@ main = do
     contents <- readFile (head args)
     let inputs = map read $ lines contents
     let outputs = map chainReveseAdd inputs
-    mapM putStrLn $ map (\x -> show (fst x) ++ " " ++ show (snd x)) outputs
-    
+    mapM_ putStrLn [show p ++ " " ++ show q | (p, q) <- outputs]
+

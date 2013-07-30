@@ -38,7 +38,7 @@ import System.Environment (getArgs)
 import Text.Regex.Posix ((=~))
 
 isEmailAddress :: String -> Bool
-isEmailAddress s = (s =~ "[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\\.[a-zA-Z0-9]+){1,2}")
+isEmailAddress s = s =~ "[A-Za-z0-9._+-]+@[A-Za-z0-9-]+(\\.[a-zA-Z0-9]+){1,2}"
 
 boolToString :: Bool -> String
 boolToString True  = "true"

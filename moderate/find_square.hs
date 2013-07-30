@@ -40,10 +40,10 @@ boolToString True  = "true"
 boolToString False = "false"
 
 parser :: String -> [Point]
-parser s = read $ '[' : s ++ ']' : []
+parser s = read $ '[' : s ++ "]"
 
 isSquare :: [Point] -> Bool
-isSquare xs = all (== (minimum dists)) $ take 4 (sort dists)
+isSquare xs = all (== minimum dists) $ take 4 (sort dists)
                 where [p1, p2, p3, p4] = xs
                       d1 = distanceSquared p1 p2
                       d2 = distanceSquared p3 p4 
@@ -57,12 +57,8 @@ distanceSquared :: Point -> Point -> Int
 distanceSquared (x1, y1) (x2, y2) = (x1 - x2)^2 + (y1 - y2)^2
 
 main = do 
-    args <- getArgs
-    let filename = head args
-    contents <- readFile filename
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map parser $ lines contents
     let outputs = map (boolToString . isSquare) inputs
     mapM putStrLn outputs
-
-
-

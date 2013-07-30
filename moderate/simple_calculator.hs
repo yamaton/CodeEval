@@ -58,20 +58,21 @@ import Data.List (isInfixOf)
 import Data.Char (isSpace)
 
 calculate :: String -> Double
-calculate = reversePolishCalc . toRPN . modifier . preModifier . splitter . (filter (not . isSpace))
+calculate = reversePolishCalc . toRPN . modifier . preModifier . splitter . filter (not . isSpace)
 
 -- | for unary operation like 3 ^ -2
 modifier :: [String] -> [String]
 modifier [] = []
 modifier [x] = [x]
 modifier [x,y] = [x,y]
-modifier (x:"-":y:xs) = if (x `isInfixOf` "^*/+-(")
-                          then x : ('-':y) : modifier xs
-                          else x : modifier ("-":y:xs)
-modifier (x:"+":y:xs) = if (x `isInfixOf` "^*/+-(")
-                          then x : y : modifier xs
-                          else x : modifier ("+":y:xs)                          
+modifier (x:"-":y:xs) = x : if x `isInfixOf` "^*/+-("
+                          then ('-':y) : modifier xs
+                          else modifier ("-":y:xs)
+modifier (x:"+":y:xs) = x : if x `isInfixOf` "^*/+-("
+                          then y : modifier xs
+                          else modifier ("+":y:xs)                          
 modifier (x:xs) = x : modifier xs
+
 
 -- | for calculation like  -3 * 3
 preModifier :: [String] -> [String]
@@ -97,11 +98,11 @@ reversePolishCalc xs = head $ foldl helper [] xs
     helper (x:y:ys) "*" = (y * x) : ys
     helper (x:y:ys) "/" = (y / x) : ys
     helper (x:y:ys) "^" = (y ** x) : ys    
-    helper xs numString = (read numString) : xs
+    helper xs numString = read numString : xs
 
 
 toRPN :: [String] -> [String]
-toRPN = reverse . (shuntingYard [] []) 
+toRPN = reverse . shuntingYard [] [] 
 
 
 -- Shunting-Yard Algorithm
@@ -132,7 +133,7 @@ precedence "(" = 0 -- Ok to have the loweset precedence because of the special t
 
 
 formatter :: Double -> String
-formatter x = reverse $ dropWhile (\c -> c == '.') $ dropWhile (\c -> c == '0') (reverse s)
+formatter x = reverse $ dropWhile (== '.') $ dropWhile (== '0') (reverse s)
   where s = printf "%.5f" x
 
 

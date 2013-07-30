@@ -41,6 +41,4 @@ main = do
     contents <- readFile (head args)
     let inputs = lines contents
     let outputs = map pangramMissing inputs
-    mapM putStrLn $ map format outputs
-
-
+    mapM_ (putStrLn . format) outputs

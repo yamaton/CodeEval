@@ -1,7 +1,9 @@
 {-
 Spiral Printing
 ===============
-Created by Yamato Matsuoka on 2013-07-12.
+Challenge Description
+---------------------
+Write a program to print a 2D array (n x m) in spiral order (clockwise)
 
 Input sample
 -------------
@@ -35,27 +37,27 @@ split c s = case dropWhile (== c) s of
     where (w, s'') = break (== c) s'
 
 
-spiral :: Int -> Int -> [Int] -> [Int]
+spiral :: Int -> Int -> [a] -> [a]
 spiral rowN colN numbers = helper [(0,0)] 0
   where
-    matrix = reshapeBy colN numbers
+    matrix = reshapeBy colN numbers 
     delta = cycle [(0,1), (1,0), (0,-1), (-1,0)]
-    helper :: [(Int,Int)] -> Int -> [Int]
+    --helper :: [(Int,Int)] -> Int -> [a]
     helper path@((x,y):past) deltaIx
       | (x, y) `elem` past = [matrix !! i !! j | (i, j) <- reverse past]
-      | isKeepGoing       = helper ((newX,newY):path)   deltaIx
-      | otherwise         = helper (nextPos:path) (deltaIx + 1)
+      | isKeepGoing       = helper ((newX,newY):path) deltaIx
+      | otherwise         = helper (modNextPos:path) (deltaIx + 1)
         where
           (dx, dy)= delta !! deltaIx
           (newX,newY) = (x + dx, y + dy)
-          (dx', dy') = delta !! (deltaIx + 1)
-          nextPos = (x + dx', y + dy')
           isKeepGoing = (0 <= newX) && (newX < rowN) && (0 <= newY) && (newY < colN) &&
                         (newX, newY) `notElem` past
+          (dx', dy') = delta !! (deltaIx + 1)                        
+          modNextPos = (x + dx', y + dy')                        
 
 
-reader :: String -> ((Int, Int), [Int])
-reader s = ((read s1, read s2), map read (words xs))
+reader :: String -> ((Int, Int), [String])
+reader s = ((read s1, read s2), words xs)
   where [s1, s2, xs] = split ';' s
 
 
@@ -64,5 +66,5 @@ main = do
   contents <- readFile f
   let inputs = map reader $ lines contents
   let outputs = [spiral rowN colN numbers | ((rowN, colN), numbers) <-  inputs]
-  mapM_ putStrLn $ [unwords (map show xs)| xs <- outputs]
+  mapM_ (putStrLn . unwords) outputs
 

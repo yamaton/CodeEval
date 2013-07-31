@@ -1,5 +1,5 @@
 {-
-Double Squares
+Prime Numbers
 ==============
 Created by Yamato Matsuoka on 2012-07-08.
 
@@ -27,31 +27,34 @@ For each line of input, print out the prime numbers less than N, in ascending or
 -}
 
 import System.Environment (getArgs)
+import Control.Monad (when, forM_)
+import Data.Array.ST (newArray, readArray, writeArray, runSTUArray)
+import Data.Array.Unboxed (UArray, assocs)
 import Data.List (intercalate)
 
--- >>> primesTo 20
--- [2,3,5,7,11,13,17,19]
-primesTo :: Int -> [Int]
-primesTo 2 = [2]
-primesTo n = 2 : sieve [3,5..n] where
-  sieve ys@(p:xs) 
-    | p*p > n   = ys
-    | otherwise = p : sieve (xs `minus` [p*p, p*p+2*p..])
+---- Eratosthenes sieve
+---- it can be more efficient by treating odd numbers only but it's good enough.
+sieve :: Int -> UArray Int Bool
+sieve n = runSTUArray $ do
+    let maxP = floor . sqrt $ fromIntegral n
+    sieveTF <- newArray (2, n) True 
+    forM_ [2..maxP] $ \p -> do
+      isPrime <- readArray sieveTF p
+      when isPrime $ do
+        forM_ [p*p, p*p+p .. n] $ \q -> do
+          writeArray sieveTF q False
+    return sieveTF
 
--- |
--- >>> minus [2,3,5,6] [1,3,6]
--- [2,5]
-minus :: Ord a => [a] -> [a] -> [a]
-minus xxs@(x:xs) yys@(y:ys) = 
-  case compare x y of 
-    LT -> x : minus  xs  yys
-    EQ ->     minus  xs   ys 
-    GT ->     minus xxs   ys
-minus xs _  = xs
+
+primesTo :: Int -> [Int]
+primesTo n
+  | n < 2     = []
+  | otherwise = [i | (i,True) <- assocs $ sieve n]
+
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map read $ lines contents
-  let outputs = map primesTo inputs
+  let outputs = [primesTo (n-1) | n <- inputs]
   mapM_ (putStrLn . intercalate "," . map show) outputs

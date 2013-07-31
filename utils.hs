@@ -10,12 +10,16 @@ import Control.Monad.State (evalState, get, put)
 import Data.Map (fromListWith, toList)
 import Test.QuickCheck
 
+import Control.Monad (when, forM_)
+import Data.Array.ST (newArray, readArray, writeArray, runSTUArray)
+import Data.Array.Unboxed (UArray, assocs)
+
 -- |  Round-Robin 
 -- >>> roundRobin ["abc", "d", "ef"]
 -- "adebfc"
 roundRobin :: [[a]] -> [a]
 roundRobin [] = []
-roundRobin xs = (map head xs) ++ roundRobin (filter (not . null) (map tail xs))
+roundRobin xs = map head xs ++ roundRobin (filter (not . null) (map tail xs))
 
 
 -- | Split string with specified char 
@@ -36,14 +40,14 @@ join = intercalate
 
 
 -- | Partial Permutations
--- >>> partialPermutations 2 [1 .. 4]
+-- >>> partialPermutations 2 [1..4]
 -- [[1,2],[2,1],[1,3],[3,1],[1,4],[4,1],[2,3],[3,2],[2,4],[4,2],[3,4],[4,3]]
 partialPermutations :: Int -> [a] -> [[a]]
 partialPermutations n xs = concatMap permutations $ combinations n xs
 
 
 -- | Combinations 
--- >>> combinations 2 [1 .. 4]
+-- >>> combinations 2 [1..4]
 -- [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
@@ -89,7 +93,7 @@ tally xs = toList $ fromListWith (+) [(x, 1)| x <- xs]
 -- 6765
 fibonacci :: Int -> Int
 fibonacci n = flip evalState (0,1) $ do
-  forM [0 .. (n-1)] $ \_ -> do
+  forM_ [0 .. (n-1)] $ \_ -> do
     (a, b) <- get
     put (b, a + b)
   (a, b) <- get
@@ -123,8 +127,34 @@ fromDigits xs = read $ concatMap show xs
 -- >>> cartesianProduct [[1,2,3], [7,8], [9]]
 -- [[1,7,9],[1,8,9],[2,7,9],[2,8,9],[3,7,9],[3,8,9]]
 cartesianProduct :: [[a]] -> [[a]]
-cartesianProduct xxs = foldr (\xs acc -> (:) <$> xs <*> acc) [[]] xxs
+cartesianProduct = foldr (\xs acc -> (:) <$> xs <*> acc) [[]]
 
+
+---- Eratosthenes sieve
+---- it can be more efficient by treating odd numbers only but it's good enough.
+sieve :: Int -> UArray Int Bool
+sieve n = runSTUArray $ do
+    let maxP = floor . sqrt $ fromIntegral n
+    sieveTF <- newArray (2, n) True 
+    forM_ [2..maxP] $ \p -> do
+      isPrime <- readArray sieveTF p
+      when isPrime $ do
+        forM_ [p*p, p*p+p .. n] $ \q -> do
+          writeArray sieveTF q False
+    return sieveTF
+
+
+-- Rosser's theorem is used to get an upper bound:
+-- For n-th prime number P(n), for n > 6
+-- log(n) + log(log(n)) - 1 < P(n)/n < log(n) + log(log(n))  
+-- http://en.wikipedia.org/wiki/Prime_number_theorem     
+primes :: Int -> [Int]
+primes n
+  | n < 6     = take n [2, 3, 5, 7, 11]
+  | otherwise = take n $ [i | (i,True) <- assocs $ sieve ub]
+    where 
+      x = fromIntegral n
+      ub = floor $ x * (log x + log (log x))
 
 
 -- | 
@@ -155,7 +185,7 @@ factorInteger 1 = [(1, 1)]
 factorInteger n = filter (\(_, pow) -> pow > 0) (zip primes powers) where
   divCount :: Int -> Int -> Int
   divCount m p = 
-    if (m `mod` p /= 0) 
+    if m `mod` p /= 0
       then 0 
       else 1 + divCount (m `div` p) p
   primes = primesTo $ (round . sqrt) (fromIntegral n)

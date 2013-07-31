@@ -34,5 +34,5 @@ main = do
     contents <- readFile f
     let inputs = lines contents
     let outputs = map strPerm inputs
-    mapM_ (putStrLn . (intercalate ",")) outputs
+    mapM_ (putStrLn . intercalate ",") outputs
 

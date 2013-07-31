@@ -41,9 +41,7 @@ toRegex s
     where
       (former, _:latter) = span (/= '*') s
       idx    = length former
-      modified = if (last former) == '\\'
-                   then former ++ "*"
-                   else former ++ ".*"
+      modified = former ++ if last former == '\\' then "*" else ".*"
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
@@ -56,7 +54,7 @@ boolToStr True  = "true"
 boolToStr False = "false"
 
 isContained :: String -> String -> Bool
-isContained s t = (s =~ (toRegex t))
+isContained s t = s =~ toRegex t
     
 main = do 
   f:_ <- getArgs

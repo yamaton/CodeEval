@@ -38,7 +38,7 @@ evaluate xs = head $ foldl helper [] (reverse xs) where
   helper (x:y:ys) "-" = (x - y) : ys
   helper (x:y:ys) "*" = (x * y) : ys
   helper (x:y:ys) "/" = (x `div` y) : ys
-  helper xs numString = (read numString) : xs
+  helper xs numString = read numString : xs
 
 main = do
   f:_ <- getArgs

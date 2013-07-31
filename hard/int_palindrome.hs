@@ -54,7 +54,7 @@ main = do
     args <- getArgs
     let filename = head args
     contents <- readFile filename
-    let inputs = [[read w | w <- (words line)] | line <- lines contents] :: [[Int]]
+    let inputs = [map read (words line)| line <- lines contents]
     let outputs = [numInterestingSubranges p q | [p, q] <- inputs]
     mapM print outputs
 

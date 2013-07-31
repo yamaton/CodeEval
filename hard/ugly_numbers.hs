@@ -69,7 +69,7 @@ genNumbers (x:xs) =
 -- >>> concatComb "abc"
 -- [["abc"],["ab","c"],["a","bc"],["a","b","c"]]
 concatComb :: String -> [[String]]
-concatComb s = foldr helper [[""]] s
+concatComb = foldr helper [[""]]
   where 
     helper :: Char -> [[String]] -> [[String]]
     helper c [[""]] = [[[c]]]
@@ -97,12 +97,12 @@ countUgly s = length $ filter isUgly $ concatMap genNumbers $ (strToNumber . con
 
 isUgly :: Int -> Bool
 isUgly n = any divisible [2,3,5,7]
-    where divisible k = n `mod` k == 0
+  where divisible k = n `mod` k == 0
 
 main = do 
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs  = filter (not . null) $ lines contents
-    let outputs = map countUgly inputs
-    mapM_ print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs  = filter (not . null) $ lines contents
+  let outputs = map countUgly inputs
+  mapM_ print outputs
 

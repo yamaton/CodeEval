@@ -58,7 +58,7 @@ combinations n xs
 -- >>> integralTransform [[1,2,3],[4,5,6],[7,8,9]]
 -- [[1,3,6],[5,12,21],[12,27,45]]
 integralTransform :: Matrix -> Matrix
-integralTransform = transpose . (map (scanl1 (+))) . transpose . (map (scanl1 (+)))
+integralTransform = transpose . map (scanl1 (+)) . transpose . map (scanl1 (+))
 
 -- |
 -- 

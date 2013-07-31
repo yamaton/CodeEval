@@ -45,4 +45,4 @@ main = do
     contents <- readFile f
     let inputs = map reader $ filter (not . null) $ lines contents
     let outputs = [combinationsWithReplacement n xs | (n, xs) <- inputs]
-    mapM_ (putStrLn . (intercalate ",")) outputs
+    mapM_ (putStrLn . intercalate ",") outputs

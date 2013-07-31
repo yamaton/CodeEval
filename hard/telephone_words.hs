@@ -40,7 +40,7 @@ import Data.List (intercalate)
 
 
 cartesianProduct :: [[a]] -> [[a]]
-cartesianProduct xxs = foldr (\xs acc -> (:) <$> xs <*> acc) [[]] xxs
+cartesianProduct = foldr (\xs acc -> (:) <$> xs <*> acc) [[]]
 
 
 dict :: Char -> String
@@ -66,6 +66,4 @@ main = do
   contents <- readFile f
   let inputs = filter (not . null) $ lines contents
   let outputs = map telephoneCodes inputs
-  mapM_ (putStrLn . (intercalate ",")) outputs
-
-
+  mapM_ (putStrLn . intercalate ",") outputs

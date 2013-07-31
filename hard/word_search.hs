@@ -54,7 +54,7 @@ at :: [[a]] -> Position -> a
 at field (i,j) = field !! i !! j
 
 allowed :: [[a]] -> [Position] -> [Position]
-allowed field xs = filter conditions xs
+allowed field = filter conditions
   where rows = length field
         cols = length $ head field
         conditions = \(i, j) -> (0 <= i && i < rows && 0 <= j && j < cols)

@@ -63,16 +63,16 @@ findMin xs = helper base 0 0
     helper ys num cnt
       | cnt == n - k = head ys
       | otherwise    = 
-          if elem num ys
+          if num `elem` ys
             then helper ys (num + 1) cnt
-            else helper (num:(init ys)) nextNum (cnt + 1)
+            else helper (num: init ys) nextNum (cnt + 1)
               where 
                 leaving = last ys
-                nextNum = if leaving < num then leaving else (num + 1)
+                nextNum = if leaving < num then leaving else num + 1
 
 main = do
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs = map reader $ lines contents
-    let outputs = map findMin inputs
-    mapM_ print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = map reader $ lines contents
+  let outputs = map findMin inputs
+  mapM_ print outputs

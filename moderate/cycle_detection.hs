@@ -25,47 +25,28 @@ Print to stdout the first sequence you find in each line. Ensure that there are 
 -}
 
 import System.Environment (getArgs)
-import Data.List (tails)
-import Data.Maybe (isNothing, fromJust)
-import Data.Control.Applicative ((<$>), (<*>)) 
+import Data.List (tails, find, elemIndices)
+import Data.Maybe (fromJust, isJust)
+import Control.Applicative ((<$>), (<*>)) 
 
 detectCycle :: Eq a => [a] -> Maybe [a]
 detectCycle xs = take <$> (periodicityLength <$> zs) <*> zs
-  where zs = find (\ys -> periodicityLength ys == 0) (tails xs)
+  where zs = find (\ys -> periodicityLength ys > 0) (tails xs)
 
-
--- return 0 if xs is aperiodic
+-- periodicityLength xs = 0 if xs is aperiodic
 periodicityLength :: Eq a => [a] -> Int
-periodicityLength x:xs = 
+periodicityLength []        = 0
+periodicityLength [x]       = 0
+periodicityLength ys@(x:xs) = if (null out || 2 * (head out) > len) then 0 else (head out)
   where
-    len = length xs
-    helper acc zs =     
-
-
-
-def periodicity_len(seq):
-    """
-    Return length of periodic orbit. seq must NOT contain transient.
-    0 is returned if seq is aperiodic.
-    """
-    N = len(seq)
-    head = seq[0]
-    
-    for i in range(1, N/2):
-        try:
-            periodicity = i + seq[i:].index(head) 
-        except ValueError:
-            continue
-        if periodicity <= N/2:
-            if all( seq[k+periodicity] == seq[k] for k in range(N-periodicity) ):
-                return periodicity
-    else:
-        return 0
-
+    len = length ys
+    _:idx = elemIndices x ys
+    isPeriodicEvery p = all (\i -> ys !! i == ys !! (i+p)) [0 .. len - p - 1]
+    out = dropWhile (not . isPeriodicEvery) idx
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
-    let inputs = [map read (words line) | line <- filter (not . null) (lines contents)]
-    let outputs = filter (not . null) $ map findCycle inputs
-    mapM_ putStrLn $ [unword (map show out) | out <- outputs] 
+    let inputs = [map read (words line) | line <- filter (not . null) (lines contents)] :: [[Int]]
+    let outputs = filter isJust $ map detectCycle inputs :: [Maybe [Int]]
+    mapM_ (putStrLn . unwords . map show . fromJust) outputs

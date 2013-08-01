@@ -1,5 +1,6 @@
 http://abc.com:80/~smith/home.html;http://ABC.com/%7Esmith/home.html
 http://abc.com:40/~smith/home.html;http://ABC.com:70/%7Esmith/home.html
 http://abc.com/~smith/home.html;http://ABC.com:80/%7Esmith/home.HTML
+foo://username:password@example.com:80/over/there/index.dtb?type=animal&name=narwhal#nose;foo://username:password@Example.com/over/there/index.dtb?type=animal&name=narwhal#nose
 foo://username:password@example.com:80/over/there/index.dtb?type=animal&name=narwhal#nose;foo://username:password@Example.com:/over/there/index.dtb?type=animal&name=narwhal#nose
-foo://username:password@example.com:port/over/there/index.dtb?type=animal&name=narwhal#nose;foo://username:password@Example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose
+foo://username:password@example.com:2432/over/there/index.dtb?type=animal&name=narwhal#nose;foo://username:password@Example.com:8042/over/there/index.dtb?type=animal&name=narwhal#nose

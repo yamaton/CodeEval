@@ -28,6 +28,9 @@ True
 -}
 
 import System.Environment (getArgs)
+import Data.Char (toLower)
+import Data.Maybe (fromJust)
+import Network.URI
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
@@ -35,12 +38,23 @@ split c s = case dropWhile (== c) s of
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
 
-decomposeURI :: String -> [String]
-decomposeURI = undefined
-
+---- [TODO] Replace `fromJust` with Monad operation
 isEquivalentURI :: String -> String -> Bool
-isEquivalentURI = undefined
+isEquivalentURI s t = all (\f -> f ss == f tt) [port, host, scheme, users, path, query, fragment]
+  where ss = (fromJust . parseURI . unEscapeString) s
+        tt = (fromJust . parseURI . unEscapeString) t
+        port = portModify . uriPort . fromJust . uriAuthority
+        host = map toLower . uriRegName . fromJust . uriAuthority        
+        scheme = map toLower . uriScheme
+        users = uriUserInfo . fromJust . uriAuthority
+        path = uriPath
+        query = uriQuery
+        fragment = uriFragment
 
+portModify :: String -> String
+portModify "" = ":80"
+portModify ":" = ":80"
+portModify s  = s
 
 main = do 
   f:_ <- getArgs

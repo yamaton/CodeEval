@@ -39,82 +39,94 @@ e.g.
 -}
 
 import System.Environment (getArgs)
+import Control.Applicative ((<$>), (<*>))
+import Control.Monad (when, forM_)
+import Data.Array.ST (newArray, readArray, writeArray, runSTUArray)
+import Data.Array.Unboxed (UArray, assocs)
+import Data.Map (fromListWith, toList)
+import Data.List (sort)
 
-def EratosthenesSieve(N):
-    """Construct a list of primes equal or less than N."""
-    numbers = [True] * (N+1)
-    max_p = int(math.sqrt(N))
-    for p in (i for i in range(2, max_p+1) if numbers[i]):
-        for q in range(p*p, N+1, p):
-            numbers[q] = False
-    return [i for i in range(2, N+1) if numbers[i]]
+---- Eratosthenes sieve
+sieve :: Int -> UArray Int Bool
+sieve n = runSTUArray $ do
+  let maxP = floor . sqrt $ fromIntegral n
+  sieveTF <- newArray (2, n) True 
+  forM_ [2..maxP] $ \p -> do
+    isPrime <- readArray sieveTF p
+    when isPrime $ do
+      forM_ [p*p, p*p+p .. n] $ \q -> do
+        writeArray sieveTF q False
+  return sieveTF
 
+-- | 
+-- >>> primesTo 20
+-- [2,3,5,7,11,13,17,19]
+primesTo :: Int -> [Int]
+primesTo n
+  | n < 2     = []
+  | otherwise = [i | (i,True) <- assocs $ sieve n]
 
+-- |
+-- >>> factorInteger 5
+-- [(5,1)]
+factorInteger :: Int -> [(Int, Int)]
+factorInteger 0 = [(0, 1)]
+factorInteger 1 = [(1, 1)]
+factorInteger n = tally $ factor n
+  where
+    primes = primesTo $ (round . sqrt) (fromIntegral n)
+    factor 1 = []
+    factor p = k : factor (p `div` k)
+      where 
+        divisors = dropWhile (\q -> p `mod` q /= 0) primes
+        k = if null divisors then p else head divisors
 
-def divisors(n):
-    if n == 0: return None
-    if n == 1: return [1]
-    fi = factorinteger(n)
-    itr = ([x**i for i in range(p+1)] for (x, p) in fi)
-    return sorted(reduce(operator.mul, x) for x in itertools.product(*itr))
-
-
-def is_square(n):
-    x = int(n**0.5)
-    return x*x == n
-
-
-def count_square_sums(n):
-    """Use Jacobi's two square theorem"""
-    if n == 0: return 1
-    total = 4*( sum(1 for i in divisors(n) if i % 4 == 1) 
-              - sum(1 for i in divisors(n) if i % 4 == 3) )
-    ## Remove duplicate countings if n > 0
-    ##      Eight duplicates: (+/-a, +/-b) (+/-b, +/-a) 
-    ##      Four duplicates: (0,+1), (0,-1), (+1,0), (-1,0)
-    ##      Four duplicates: (+/-1,+/-1)
-    flg = 0
-    if is_square(n): flg += 1
-    if is_square(n/2) and (n % 2 == 0): flg += 1
-    return (total + 4*flg)/8    
-
-
-def test():
-    assert EratosthenesSieve(0) == []
-    assert EratosthenesSieve(1) == []
-    assert EratosthenesSieve(2) == [2]
-    assert EratosthenesSieve(15) == [2, 3, 5, 7, 11, 13]
-    
-    assert factorinteger(0) == [(0, 1)]
-    assert factorinteger(1) == [(1, 1)]
-    assert factorinteger(12) == [(2, 2), (3, 1)]
-    assert factorinteger(128) == [(2, 7)]
-    
-    assert divisors(0) == None
-        
-    assert divisors(1) == [1]
-    assert divisors(5) == [1, 5]
-    assert divisors(12) == [1, 2, 3, 4, 6, 12]
-    
-    assert is_square(0) is True
-    assert is_square(1) is True
-    assert is_square(2) is False
-    assert is_square(101) is False
-    
-    assert count_square_sums(0) == 1
-    assert count_square_sums(1) == 1
-    assert count_square_sums(10) == 1
-    assert count_square_sums(3) == 0
-    assert count_square_sums(25) == 2
-    print "passed all tests!"
+-- | 
+-- >>> divisors 24
+-- [1,2,3,4,6,8,12,24]
+-- >>> divisors 151
+-- [1,151]
+divisors :: Int -> [Int]
+divisors 1 = [1]
+divisors n = sort [product xs | xs <- cartesianProduct factors]
+  where factors = [ map (n^) [0..pow] | (n, pow) <- factorInteger n ]
 
 
+-- |
+-- >>> tally "aaaddbcdabbbaf"
+-- [('a',5),('b',4),('c',1),('d',3),('f',1)]
+tally :: Ord a => [a] -> [(a, Int)]
+tally xs = toList $ fromListWith (+) [(x, 1)| x <- xs]
+
+
+-- |
+-- >>> cartesianProduct [[1,2,3], [7,8], [9]]
+-- [[1,7,9],[1,8,9],[2,7,9],[2,8,9],[3,7,9],[3,8,9]]
+cartesianProduct :: [[a]] -> [[a]]
+cartesianProduct = foldr (\xs acc -> (:) <$> xs <*> acc) [[]]
+
+
+-- |
+-- >>> isSquare 9
+-- True
+-- >>> isSquare 10
+-- False 
+isSquare :: Int -> Bool
+isSquare n = n == ((round . sqrt . fromIntegral) n)^2
+
+
+-- Use Jacobi's two square theorem
 countSquareSums :: Int -> Int
-countSquareSums = undefined
+countSquareSums 0 = 1
+countSquareSums n = (total + flg) `div` 2
+  where
+    total = sum [1 | i <- divisors n, i `mod` 4 == 1] - sum [1 | i <- divisors n, i `mod` 4 == 3]
+    flg = (if isSquare n then 1 else 0) + (if even n && isSquare (n `div` 2) then 1 else 0)
+
 
 main = do 
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs  = map read $ lines contents
-    let outputs = map countSquareSums inputs
-    mapM print outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs  = map read $ filter (not . null) $ tail $ lines contents
+  let outputs = map countSquareSums inputs
+  mapM_ print outputs

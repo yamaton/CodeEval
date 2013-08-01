@@ -131,7 +131,6 @@ cartesianProduct = foldr (\xs acc -> (:) <$> xs <*> acc) [[]]
 
 
 ---- Eratosthenes sieve
----- it can be more efficient by treating odd numbers only but it's good enough.
 sieve :: Int -> UArray Int Bool
 sieve n = runSTUArray $ do
     let maxP = floor . sqrt $ fromIntegral n
@@ -144,10 +143,12 @@ sieve n = runSTUArray $ do
     return sieveTF
 
 
--- Rosser's theorem is used to get an upper bound:
+-- | Rosser's theorem is used to get an upper bound:
 -- For n-th prime number P(n), for n > 6
 -- log(n) + log(log(n)) - 1 < P(n)/n < log(n) + log(log(n))  
--- http://en.wikipedia.org/wiki/Prime_number_theorem     
+-- http://en.wikipedia.org/wiki/Prime_number_theorem
+-- >>> primes 10
+-- [2,3,5,7,11,13,17,19,23,29]
 primes :: Int -> [Int]
 primes n
   | n < 6     = take n [2, 3, 5, 7, 11]
@@ -156,50 +157,47 @@ primes n
       x = fromIntegral n
       ub = floor $ x * (log x + log (log x))
 
-
 -- | 
 -- >>> primesTo 20
 -- [2,3,5,7,11,13,17,19]
 primesTo :: Int -> [Int]
-primesTo 2 = [2]
-primesTo n = 2 : sieve [3,5..n] where
-  sieve ys@(p:xs) 
-    | p*p > n   = ys
-    | otherwise = p : sieve (xs `minus` [p*p, p*p+2*p..])
+primesTo n
+  | n < 2     = []
+  | otherwise = [i | (i,True) <- assocs $ sieve n]
 
--- |
--- >>> minus [2,3,5,6] [1,3,6]
--- [2,5]
-minus xxs@(x:xs) yys@(y:ys) = case (compare x y) of 
-           LT -> x : minus  xs  yys
-           EQ ->     minus  xs   ys 
-           GT ->     minus xxs   ys
-minus xs _  = xs
 
 -- | 
 -- >>> factorInteger 24
 -- [(2,3),(3,1)]
+-- >>> factorInteger 141
+-- [(3,1),(47,1)]
+-- >>> factorInteger 151
+-- [(151,1)]
+-- >>> factorInteger 5
+-- [(5,1)]
 factorInteger :: Int -> [(Int, Int)]
 factorInteger 0 = [(0, 1)]
 factorInteger 1 = [(1, 1)]
-factorInteger n = filter (\(_, pow) -> pow > 0) (zip primes powers) where
-  divCount :: Int -> Int -> Int
-  divCount m p = 
-    if m `mod` p /= 0
-      then 0 
-      else 1 + divCount (m `div` p) p
-  primes = primesTo $ (round . sqrt) (fromIntegral n)
-  powers = map (divCount n) primes
+factorInteger n = tally $ factor n
+  where
+    primes = primesTo $ (round . sqrt) (fromIntegral n)
+    factor 1 = []
+    factor p = k : factor (p `div` k)
+      where 
+        divisors = dropWhile (\q -> p `mod` q /= 0) primes
+        k = if null divisors then p else head divisors
 
 -- | 
 -- >>> divisors 24
 -- [1,2,3,4,6,8,12,24]
+-- >>> divisors 141
+-- [1,3,47,141]
+-- >>> divisors 151
+-- [1,151]
 divisors :: Int -> [Int]
 divisors 1 = [1]
 divisors n = sort [product xs | xs <- cartesianProduct factors]
-  where 
-    fi = factorInteger n
-    factors = [ map (n^) [0..pow] | (n, pow) <- fi ]
+  where factors = [ map (n^) [0..pow] | (n, pow) <- factorInteger n ]
 
 
 -- | Check if integer is palindrome

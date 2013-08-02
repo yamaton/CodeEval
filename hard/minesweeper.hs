@@ -30,53 +30,51 @@ Print out the new M*N matrix (in row major form) with each position(except the o
 
 import System.Environment (getArgs)
 
-mineSweep :: Int -> Int -> String -> String
+type Board = [[Char]]
+type Coord = (Int, Int)
 
+mineSweep :: Board -> Int -> Int -> String
+mineSweep board m n = [cellInfo board (i, j) | i <- [0 .. m-1], j <- [0 .. n-1]]
 
-def minesweep(row, col, mines):
-    x = add_wall(row, col, mines)
-    return ["".join(count_mines(i, j, x) for j in range(1, col+1))  
-                for i in range(1, row+1)]
+cellInfo :: Board -> Coord -> Char
+cellInfo board (i, j) 
+  | get board (i,j) == '*' = '*'
+  | otherwise              = charN
+    where charN:_ = show $ countMine board (i, j)
 
+get ::  Board -> Coord -> Char
+get board (i,j) = board !! i !! j
 
-def add_wall(row, col, mines):
-    mines_with_wall = ['.' + line + '.' for line in mines]
-    wall = ['.' * (col + 2)]
-    mines_with_wall = wall + mines_with_wall + wall
-    return mines_with_wall
-
-
-def count_mines(i, j, mines):
-    m = mines
-    if m[i][j] == '*':
-        return "*"
-    else:
-        surroundings = "".join([line[j-1:j+2] for line in m[i-1:i+2]])
-        return str(surroundings.count('*'))
-
-
-countMines :: (Int, Int) -> [String] -> Char
-countMines (i, j) xxs
-  | m !! i !! j == '*' = '*'
-  | otherwise          = 
-
+countMine :: Board -> Coord -> Int
+countMine board (i, j) = length $ filter (== '*') $ map (get board) neighbours
+    where (m, n) = (length board, length (head board))
+          neighbours = [(p,q) | p <- [i-1,i,i+1], q <- [j-1,j,j+1],
+                                0 <= p, p < m, 0 <= q, q < n]
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
   "" -> []
-  s' -> w : split c s''
-    where (w, s'') = break (== c) s'
+  s' -> w : split c s'' where 
+    (w, s'') = break (== c) s'
 
 
-reader :: String -> (Int, Int, String)
-reader s = (m, n, latter) where
-  (former, latter) = split ';' s
+reshapeBy :: Int -> [a] -> [[a]]
+reshapeBy n xs = 
+  case splitAt n xs of
+    ([], _)  -> []
+    (ys,zs)  -> ys : reshapeBy n zs
+
+
+reader :: String -> (Int, Int, Board)
+reader s = (m, n, board) where
+  [former, latter] = split ';' s
   [m, n] = map read (split ',' former)
+  board = reshapeBy n latter
 
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map reader $ lines contents
-  let outputs = [mineSweep m n s | (m, n, s) <- inputs]
+  let outputs = [mineSweep b m n | (m, n, b) <- inputs]
   mapM_ putStrLn outputs

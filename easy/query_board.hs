@@ -47,14 +47,38 @@ For each query, output the answer of the query. E.g.
 -}
 
 import System.Environment (getArgs)
+import Data.List (transpose)
+import Control.Monad.State (State, runState, get, put)
 
 data Command = SetCol | SetRow | QueryCol | QueryRow deriving (Read, Show)
 
+initialBoard :: [[Int]]
+initialBoard = replicate 256 $ replicate 256 0
 
---queryBoard :: Command -> [Int] -> [Int]
---queryBoard com xs = helper 
---  where
---    helper com state output = 
+queryBoard :: [(Command, [Int])] -> ([[Int]], [Int])
+queryBoard commands = snd $ flip runState (initialBoard, []) $ do
+  --(com, x:xs) <- commands --- problem ! 
+  let (com, x:xs) = head commands
+  (board, out) <- get
+  case com of 
+    SetRow   -> put (setRow x (head xs) board,  out)
+    SetCol   -> put (setCol x (head xs) board,  out)
+    QueryRow -> put (board,   queryRow x board : out)
+    QueryCol -> put (board,   queryCol x board : out)
+
+
+setRow :: Int -> Int -> [[Int]] -> [[Int]]
+setRow i x mat = take i mat ++ [replicate m x] ++ drop (i + 1) mat
+  where m = length (head mat)
+
+setCol :: Int -> Int -> [[Int]] -> [[Int]]
+setCol j x mat = transpose $ setRow j x (transpose mat)
+
+queryRow :: Int -> [[Int]] -> Int
+queryRow i mat = sum $ mat !! i
+
+queryCol :: Int -> [[Int]] -> Int
+queryCol j mat = queryRow j (transpose mat)
 
 parser :: String -> (Command, [Int])
 parser s = (read w, map read ws)
@@ -64,5 +88,5 @@ main = do
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map parser $ lines contents
-  let outputs = [queryBoard command vals | (command, vals) <- inputs]
-  mapM_ print inputs
+  let outputs = queryBoard inputs
+  print outputs

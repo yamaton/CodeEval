@@ -5,12 +5,11 @@ import Data.Char (intToDigit)
 import Numeric (showIntAtBase, readHex)
 import Data.List (intercalate, nub, sort, permutations)
 import Control.Applicative ((<$>), (<*>))
-import Control.Monad (forM, replicateM)
 import Control.Monad.State (evalState, get, put)
 import Data.Map (fromListWith, toList)
 import Test.QuickCheck
-
-import Control.Monad (when, forM_)
+----
+import Control.Monad (when, forM_, replicateM)
 import Data.Array.ST (newArray, readArray, writeArray, runSTUArray)
 import Data.Array.Unboxed (UArray, assocs)
 
@@ -152,7 +151,7 @@ sieve n = runSTUArray $ do
 primes :: Int -> [Int]
 primes n
   | n < 6     = take n [2, 3, 5, 7, 11]
-  | otherwise = take n $ [i | (i,True) <- assocs $ sieve ub]
+  | otherwise = take n [i | (i,True) <- assocs $ sieve ub]
     where 
       x = fromIntegral n
       ub = floor $ x * (log x + log (log x))

@@ -40,8 +40,7 @@ toRegex s
   | otherwise        = modified ++ toRegex latter
     where
       (former, _:latter) = span (/= '*') s
-      idx    = length former
-      modified = former ++ if last former == '\\' then "*" else ".*"
+      modified = former ++ if (last former == '\\') then "*" else ".*"
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
@@ -54,11 +53,11 @@ boolToStr True  = "true"
 boolToStr False = "false"
 
 isContained :: String -> String -> Bool
-isContained s t = s =~ toRegex t
+isContainedIn s t = s =~ toRegex t
     
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map (split ',') $ lines contents
-  let outputs = [isContained s t | [s, t] <- inputs]
+  let outputs = [isContainedIn s t | [s, t] <- inputs]
   mapM_ (putStrLn . boolToStr) outputs

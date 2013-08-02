@@ -22,12 +22,12 @@ roundRobin xs = map head xs ++ roundRobin (filter (not . null) (map tail xs))
 
 
 -- | Split string with specified char 
--- >>> split ',' "aa,bc,cd,e"
+-- >>> splitOn ',' "aa,bc,cd,e"
 -- ["aa","bc","cd","e"]
-split :: Char -> String -> [String]
-split c s = case dropWhile (== c) s of
+splitOn :: Char -> String -> [String]
+splitOn c s = case dropWhile (== c) s of
   "" -> []
-  s' -> w : split c s''
+  s' -> w : splitOn c s''
     where (w, s'') = break (== c) s'
 
 
@@ -51,22 +51,20 @@ partialPermutations n xs = concatMap permutations $ combinations n xs
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
 combinations _ [] = []
-combinations n xs  
-  | n == 1    = map (:[]) xs 
-  | otherwise = helper n (length xs) xs    
-    where
-      helper k l ys@(z:zs)        
-        | k < l     = map (z :) (combinations (k-1) zs)
-                         ++ combinations k zs
-        | k == l    = [ys]
-        | otherwise = []
+combinations 1 xs = map (:[]) xs 
+combinations n xs = helper n (length xs) xs    
+  where
+    helper k l ys@(z:zs)        
+      | k < l     = map (z:) (combinations (k-1) zs) ++ combinations k zs
+      | k == l    = [ys]
+      | otherwise = []
 
 
 -- | Equivalent to `combinations_with_relacement` in itertools of Python,
 -- >>> combinationsWithReplacement 2 "abc"
 -- ["aa","ab","ac","bb","bc","cc"]
 combinationsWithReplacement :: Ord a => Int -> [a] -> [[a]]
-combinationsWithReplacement n xs = nub $ map sort $ replicateM n xs
+combinationsWithReplacement n xs = nub . map sort $ replicateM n xs
 
 
 -- | Equivalent to the command in Mathematica
@@ -104,7 +102,7 @@ fibonacci n = flip evalState (0,1) $ do
 -- [4,1,5,3,1]
 integerDigits :: Int -> [Int]
 integerDigits n = map (read . (:[])) (show n)
---integerDigits' n = reverse . map (`mod` 10) $ takeWhile (> 0) $ iterate (`div` 10) n
+
 
 -- | Digits to integer
 -- >>> fromDigits [1,6,1,5,2]
@@ -121,6 +119,7 @@ fromDigits xs = read $ concatMap show xs
 --prop_digits :: [Int] -> Bool
 --prop_digits xs  =  
 --    xs == integerDigits $ fromDigits xs
+
 
 -- |
 -- >>> cartesianProduct [[1,2,3], [7,8], [9]]
@@ -179,7 +178,7 @@ factorInteger 0 = [(0, 1)]
 factorInteger 1 = [(1, 1)]
 factorInteger n = tally $ factor n
   where
-    primes = primesTo $ (round . sqrt) (fromIntegral n)
+    primes = (primesTo . round . sqrt . fromIntegral) n
     factor 1 = []
     factor p = k : factor (p `div` k)
       where 
@@ -207,8 +206,8 @@ divisors n = sort [product xs | xs <- cartesianProduct factors]
 -- >>> isPalindrome 100011
 -- False
 isPalindrome :: Int -> Bool
-isPalindrome n = let s = show n
-                 in (s == reverse s)
+isPalindrome n = s == reverse s
+  where s = show n
 
 
 -- | Check if integer is prime number
@@ -221,8 +220,9 @@ isPrime 2 = True
 isPrime n
   | n < 2     = False
   | even n    = False
-  | otherwise = all (\p -> mod n p /= 0) [3, 5 .. ub]
-                where ub = (floor . sqrt . fromIntegral) n
+  | otherwise = all ((/= 0) . mod n) [3, 5 .. ub]
+    where ub = (floor . sqrt . fromIntegral) n
+
                 
 -- | Integer to binary string  
 -- >>> intToBin 100
@@ -237,7 +237,7 @@ intToBin n = showIntAtBase 2 intToDigit n ""
 -- >>> hexToInt "Ab"
 -- 171
 hexToInt :: String -> Int
-hexToInt s = (fst . head) $ readHex s
+hexToInt = fst . head . readHex
 
 
 -- | Conunt elements in list

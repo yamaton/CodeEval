@@ -44,8 +44,6 @@ O draconian devil! Oh lame saint!
 Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
 ```
 
-[Comment]
-    This code is ugly and there is much rooms for imperformance improvements.
 -}
 
 import System.Environment (getArgs)
@@ -56,27 +54,27 @@ import qualified Data.Text as T
 partialPermutations :: Int -> [a] -> [[a]]
 partialPermutations n xs = concatMap permutations $ combinations n xs
 
+
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
 combinations _ [] = []
 combinations 1 xs = map (:[]) xs 
 combinations n xs = helper n (length xs) xs
-  where
-    helper k l ys@(z:zs)        
-      | k < l     = map (z :) (combinations (k-1) zs) ++ combinations k zs
-      | k == l    = [ys]
-      | otherwise = []
+  where helper k l ys@(z:zs)        
+          | k < l     = map (z :) (combinations (k-1) zs) ++ combinations k zs
+          | k == l    = [ys]
+          | otherwise = []
 
 
 overlapLength :: [Text] -> Int
 overlapLength [s1, s2] 
   | T.isInfixOf s1 s2 = T.length s1
   | otherwise         = helper (T.tail s1)
-  where
-    helper :: Text -> Int
-    helper xs
-      | T.isPrefixOf xs s2 = T.length xs
-      | otherwise          = helper (T.tail xs)
+  where helper :: Text -> Int
+        helper xs
+          | T.isPrefixOf xs s2 = T.length xs
+          | otherwise          = helper (T.tail xs)
+
 
 merge :: Int -> Text -> Text -> Text
 merge n s1 s2 = append (T.take k s1) s2
@@ -85,9 +83,7 @@ merge n s1 s2 = append (T.take k s1) s2
 daVyncy :: [Text] -> Text
 daVyncy [x] = x
 daVyncy xs = daVyncy $ merge n s1 s2 : foldl (flip delete) xs [s1, s2]
-  where 
-    pairs = partialPermutations 2 xs
-    (n, [s1, s2]) = maximum $ map (\p -> (overlapLength p, p)) pairs
+  where (n, [s1, s2]) = maximum $ map (\p -> (overlapLength p, p)) (partialPermutations 2 xs)
 
 
 reader :: String -> [Text]

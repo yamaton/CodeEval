@@ -52,9 +52,8 @@ Things that are good: Documentation, Readability, Simplicity. Things that are no
 
 Bonus points for:
 1. Making it able to dynamically add new corpus data. 
-      ---> Done
 2. Allow reverse ngram lookups to find what words commonly precede words/phrases
-      ---> Done
+
 
 [TODOs]
 For some reason the program does not pass with 100 score.

@@ -31,11 +31,11 @@ splitEvery :: Int -> [a] -> [[a]]
 splitEvery n xs = map (take n) $ takeWhile (not . null) $ iterate (drop n) xs
 
 reverseEvery :: Int -> [a] -> [a]
-reverseEvery n xs = concat $ map reverse (splitEvery n xs)
+reverseEvery n xs = concatMap reverse (splitEvery n xs)
 
 reverseGroup :: [Int] -> Int -> [Int]
 reverseGroup xs k = xss ++ remainder
-    where (body, remainder) = splitAt (((length xs) `div` k) * k) xs
+    where (body, remainder) = splitAt ((length xs `div` k) * k) xs
           xss = reverseEvery k body
 
 split :: Char -> String -> [String]
@@ -45,7 +45,7 @@ split c s = case dropWhile (== c) s of
                      where (w, s'') = break (== c) s'
 
 join :: Char -> [String] -> String
-join c s = intercalate (c:[]) s
+join c = intercalate [c]
 
 parser :: String -> ([Int], Int)
 parser s = (map read (split ','  former), read latter)
@@ -53,9 +53,9 @@ parser s = (map read (split ','  former), read latter)
 
 
 main = do 
-    args <- getArgs
-    contents <- readFile (head args)
+    f:_ <- getArgs
+    contents <- readFile f
     let inputs = map parser $ lines contents
     let outputs = [reverseGroup xs n | (xs, n) <- inputs]
-    mapM putStrLn [join ',' (map show out) | out <- outputs]
+    mapM_ (putStrLn . join ',' . map show) outputs
 

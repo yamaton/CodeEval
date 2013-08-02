@@ -77,19 +77,21 @@ combinations n xs
 
 overlapLength :: [String] -> Int
 overlapLength ss
-  | isInfixOf sm lg = length sm
+  | sm `isInfixOf` lg = length sm
   | otherwise       = max (helper isPrefixOf tail sm lg) (helper isSuffixOf init sm lg)
     where
       [sm, lg] = sortWith length ss
       helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> Int
-      helper f next xs ys = if (f (next xs) ys) then (length xs - 1) else (helper f next (next xs) ys)
+      helper f next xs ys = if f (next xs) ys then length xs - 1 else helper f next (next xs) ys
 
 
 merge :: String -> String -> Int -> String
 merge s1 s2 n
+  | n > lenSm                        = error "something is VERY wrong!"
   | n == lenSm                       = lg
   | take n sm == drop (lenLg - n) lg = lg ++ drop n sm
-  | otherwise                        = sm ++ drop n lg
+  | take n lg == drop (lenSm - n) sm = sm ++ drop n lg
+  | otherwise                        = error "something is wrong!"
     where
       (lenS1, lenS2) = (length s1, length s2)
       (sm, lg) = if lenS1 < lenS2 then (s1, s2) else (s2, s1)
@@ -100,12 +102,12 @@ merge s1 s2 n
 daVyncy :: [String] -> String
 daVyncy [x] = x
 daVyncy xs = 
-  daVyncy $ (merge s1 s2 n) : (foldl (flip delete) xs [s1, s2])
-    where (n, [s1, s2]) = last . sort $ map (\pair -> (overlapLength pair, pair)) $ combinations 2 xs
+  daVyncy $ merge s1 s2 n : foldl (flip delete) xs [s1, s2]
+    where (n, [s1, s2]) = maximum $ map (\pair -> (overlapLength pair, pair)) $ combinations 2 xs
 
 
 reader :: String -> [String]
-reader s = split ';' s
+reader = split ';'
 
 main = do 
     f:_ <- getArgs

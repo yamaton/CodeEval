@@ -35,7 +35,7 @@ So for the given example the correct answer would be
 import System.Environment (getArgs)
 
 addNeighbourMax :: [Int] -> [Int] -> [Int]
-addNeighbourMax xs acc = zipWith (+) xs (zipWith max (tail acc) (init acc))
+addNeighbourMax xs acc = zipWith (+) xs $ zipWith max (tail acc) (init acc)
 
 maxPassTriangle :: [[Int]] -> Int
 maxPassTriangle xxs = head $ foldr1 addNeighbourMax xxs

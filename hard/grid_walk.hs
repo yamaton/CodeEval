@@ -15,47 +15,52 @@ Output sample
 --------------
 Print the number of points the monkey can access. It should be printed as an integer — for example, if the number of points is 10, print "10", not "10.0" or "10.00", etc.
 
--}
 
+
+[Strategy]
+Restrict ourselves in 1/8 of the x-y plane only (0<=y<=x) due to the symmetry.
+
+-}
+import Data.List (nub)
+type Coord = (Int, Int)
+
+-- |
+-- >>> digitSum 5979
+-- 30
 digitSum :: Int -> Int
 digitSum n = sum (integerDigits n)
-    where integerDigits n = map (read . (:[])) (show n)
+  where integerDigits n = map (read . (:[])) (show n)
+
+isAccessible :: Coord -> Bool
+isAccessible (x, y) = isInDomain && isDigitSumOK
+  where
+    isInDomain = y <= x
+    isDigitSumOK = (digitSum x + digitSum y) <= 19
 
 
-def scan_grid():
-    ini = (0, 0)
-    queue = [ini]
-    visited = set([ini])
-    delta = [(0, 1), (1, 0)]
-
-    while queue:
-        p = queue.pop()
-        for direction in delta:
-            x = p[0] + direction[0]
-            y = p[1] + direction[1]
-            if is_accessible(x, y) and (x, y) not in visited:
-                queue.append((x, y))
-                visited.add((x, y))
-    return visited
+scanGrid :: [Coord]
+scanGrid = scanHelper [(0, 0)] [(0, 0)]
+  where 
+    scanHelper :: [Coord] -> [Coord] -> [Coord]
+    scanHelper []            visited = visited
+    scanHelper ((x,y):stack) visited 
+      | null nextAllowed = scanHelper stack visited
+      | otherwise        = scanHelper (nextAllowed ++ stack) (nextAllowed ++ visited)
+        where 
+          nextCoords  = [(x+1, y), (x, y+1)]
+          nextAllowed = filter (`notElem` visited) $ filter isAccessible nextCoords
 
 
-def count(points):
-    edge_num = len([1 for (x, y) in points if x == y or y == 0]) - 1
-    inner_num = len(points) - edge_num - 1
-    return 8 * inner_num + 4 * edge_num + 1
+---- - 1 / + 1 : excluding the coordinate (0,0) first and then add it later
+adjustCount :: [Coord] -> Int
+adjustCount points =  8 * innerCount + 4 * edgeCount + 1 
+  where
+    edgeCount = sum [1 | (x,y) <- points, x == y || y == 0] - 1
+    innerCount = length points - edgeCount - 1
 
 
-def is_accessible(x, y):
-    if x < 0 or y < 0:
-        return False
-    elif y > x:
-        return False
-    else:
-        return digits_sum(x) + digits_sum(y) <= 19
-
-
-def count_grid_walk():
-    return count(scan_grid())
+countGridWalk :: Int
+countGridWalk = adjustCount scanGrid
 
 main = do
-    print countGridWalk
+  print countGridWalk

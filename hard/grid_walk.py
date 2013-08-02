@@ -52,12 +52,8 @@ def count(points):
 
 
 def is_accessible(x, y):
-    if x < 0 or y < 0:
-        return False
-    elif y > x:
-        return False
-    else:
-        return digits_sum(x) + digits_sum(y) <= 19
+    return (0 <= x and 0 <= y and x >= y and 
+            digits_sum(x) + digits_sum(y) <= 19)
 
 
 def count_grid_walk():

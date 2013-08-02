@@ -49,9 +49,12 @@ Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, ad
 -}
 
 import System.Environment (getArgs)
-import Data.List (delete)
+import Data.List (delete, permutations)
 import Data.Text (Text, append, pack, unpack, splitOn)
 import qualified Data.Text as T
+
+partialPermutations :: Int -> [a] -> [[a]]
+partialPermutations n xs = concatMap permutations $ combinations n xs
 
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
@@ -64,37 +67,27 @@ combinations n xs = helper n (length xs) xs
       | k == l    = [ys]
       | otherwise = []
 
-overlapLength :: [Text] -> Int
-overlapLength [s1, s2]
-  | T.isInfixOf sm lg = T.length sm
-  | otherwise         = max (helper T.isPrefixOf T.tail sm lg) (helper T.isSuffixOf T.init sm lg)
-    where
-      [lenS1, lenS2] = map T.length [s1, s2]
-      (sm, lg) = if lenS1 <= lenS2 then (s1, s2) else (s2, s1)
-      helper :: (Text -> Text -> Bool) -> (Text -> Text) -> Text -> Text -> Int
-      helper f next xs ys
-        | f (next xs) ys   = (T.length xs - 1)
-        | otherwise        = helper f next (next xs) ys
 
+overlapLength :: [Text] -> Int
+overlapLength [s1, s2] 
+  | T.isInfixOf s1 s2 = T.length s1
+  | otherwise         = helper (T.tail s1)
+  where
+    helper :: Text -> Int
+    helper xs
+      | T.isPrefixOf xs s2 = T.length xs
+      | otherwise          = helper (T.tail xs)
 
 merge :: Int -> Text -> Text -> Text
-merge n s1 s2
-  | n > lenSm                            = error "something is VERY wrong!"
-  | n == lenSm                           = lg
-  | T.take n sm == T.drop (lenLg - n) lg = append lg (T.drop n sm)
-  | T.take n lg == T.drop (lenSm - n) sm = append sm (T.drop n lg)
-  | otherwise                            = error "something is wrong!"
-    where
-      (lenS1, lenS2) = (T.length s1, T.length s2)
-      (sm, lg) = if lenS1 < lenS2 then (s1, s2) else (s2, s1)
-      lenSm = min lenS1 lenS2
-      lenLg = max lenS1 lenS2
-
+merge n s1 s2 = append (T.take k s1) s2
+  where k = T.length s1 - n
 
 daVyncy :: [Text] -> Text
 daVyncy [x] = x
 daVyncy xs = daVyncy $ merge n s1 s2 : foldl (flip delete) xs [s1, s2]
-  where (n, [s1, s2]) = maximum $ map (\pair -> (overlapLength pair, pair)) $ combinations 2 xs
+  where 
+    pairs = partialPermutations 2 xs
+    (n, [s1, s2]) = maximum $ map (\p -> (overlapLength p, p)) pairs
 
 
 reader :: String -> [Text]

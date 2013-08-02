@@ -1,0 +1,45 @@
+	Mon Jul 29 23:24 2013 Time and Allocation Profiling Report  (Final)
+
+	   levenshtein_distance.exe +RTS -p -RTS levenshtein_distance.txt
+
+	total time  =       29.32 secs   (29319 ticks @ 1000 us, 1 processor)
+	total alloc = 12,376,561,800 bytes  (excludes profiling overheads)
+
+COST CENTRE          MODULE  %time %alloc
+
+isFriend             Main     25.5   34.9
+isFriend.lenS        Main     25.2   13.1
+isFriend.lenT        Main     22.6   13.1
+friendNetwork        Main     13.0   27.2
+friendNetwork.next.\ Main      7.6    0.1
+isFriend.n           Main      3.3   11.0
+isFriend.\           Main      1.8    0.0
+
+
+                                                                    individual     inherited
+COST CENTRE               MODULE                  no.     entries  %time %alloc   %time %alloc
+
+MAIN                      MAIN                     45           0    0.0    0.0   100.0  100.0
+ main                     Main                     91           0    0.1    0.4   100.0  100.0
+  main.wordList           Main                     94           1    0.1    0.2     0.1    0.2
+  countFriendNetwork      Main                     92           1    0.0    0.0    99.9   99.4
+   friendNetwork          Main                     93          34   13.0   27.2    99.9   99.4
+    friendNetwork.next    Main                     95          33    0.1    0.0    86.9   72.2
+     friendNetwork.next.\ Main                     96      655316    7.6    0.1    86.8   72.2
+      isFriend            Main                     97   101200247   25.5   34.9    79.2   72.1
+       isFriend.n         Main                    103    14795250    3.3   11.0     4.0   11.0
+        isFriend.n.\      Main                    104    16144134    0.7    0.0     0.7    0.0
+       isFriend.\         Main                    102    47949010    1.8    0.0     1.8    0.0
+       isFriend.lenT      Main                     99   101200247   22.6   13.1    22.6   13.1
+       isFriend.lenS      Main                     98   101200247   25.2   13.1    25.2   13.1
+ CAF:main1                Main                     88           0    0.0    0.0     0.0    0.0
+  main                    Main                     90           1    0.0    0.0     0.0    0.0
+ CAF:main3                Main                     87           0    0.0    0.0     0.0    0.0
+  main                    Main                    100           0    0.0    0.0     0.0    0.0
+   countFriendNetwork     Main                    101           0    0.0    0.0     0.0    0.0
+ CAF:$dEq_r2fe            Main                     84           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.Conc.Signal          83           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Encoding          76           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Encoding.Iconv    74           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.FD                69           0    0.0    0.0     0.0    0.0
+ CAF                      GHC.IO.Handle.FD         67           0    0.0    0.0     0.0    0.0

@@ -24,9 +24,9 @@ MJAU
 [Comment]
     ver 0.9 ... lcs using Data.List (subsequences) is too slow to pass CodeEval.
 -}
+
 import System.Environment (getArgs)
-import Data.List (subsequences, intersect)
-import GHC.Exts (sortWith)
+
 
 split :: Char -> String -> [String]
 split c s = case dropWhile (== c) s of
@@ -34,10 +34,18 @@ split c s = case dropWhile (== c) s of
   s' -> w : split c s''
     where (w, s'') = break (== c) s'
 
-lcs :: String -> String -> String
-lcs s t = if null xs then "" else (last $ sortWith length xs)
-  where xs = intersect (subsequences s) (subsequences t)
 
+lcsLengthMatrix :: String -> String -> [[Int]]
+lcsLengthMatrix s t = 
+  where
+    lenS = length s
+    lenT = length t
+    nextRow row = scanl (\acc (i, x) ->   ) 0 xs
+      where xs = zip [0 .. length row - 1] row 
+
+lcs :: String -> String -> String
+lcs s t = backtrack mat s t (length s - 1) (length t - 1)
+  where mat = lcsLengthMatrix s t
 
 main = do 
   f:_ <- getArgs

@@ -46,77 +46,77 @@ right
 -}
 
 import System.Environment (getArgs)
-import Data.List (sort, elemIndex)
+import Data.List (sort, elemIndex, nub)
+import Data.Maybe (fromJust)
+import GHC.Exts (sortWith)
 
-type Hand = [String]
-type Rank = Int
+type Hand = [String] -- example: ["6D", "7H", "AH", "7S", "QC"]
+type Rank = Int      
 
 poker :: Hand -> Hand -> String
-poker hand1 hand2 =
-  | length outcome > 1    = "none"
-  | head outcome == hand1 = "left"
-  | otherwise             = "right"
-    where outcome = allMax handrank hand1 hand2
+poker hand1 hand2
+  | (not . null) extra = "none"
+  | out == hand1       = "left"
+  | otherwise          = "right"
+    where out:extra = allMax handRank [hand1, hand2]
 
-allMax :: Ord a => (Hand -> Int) -> [Hand] -> [Hand]
-allMax rank xs = filter (==oneMax) xs
-  where oneMax = last $ sortWith rank xs
+allMax :: (Eq a, Ord b) => (a -> b) -> [a] -> [a]
+allMax rankFunc hands = filter (\h -> rankFunc h == oneMax) hands
+  where oneMax = last . sort $ map rankFunc hands
+
 
 handRank :: Hand -> (Rank, [Rank])
-  | isStraight ranks && isFlush hand  = (8, [max ranks])
+handRank hand
+  | isStraight ranks && isFlush hand  = (8, [maximum ranks])
   | isKind 4 ranks                    = (7, [kind 4 ranks, kind 1 ranks]) 
-  | isJust (kind 3 ranks) && 
-    isJust (kind 2 ranks)             = (6, [fromJust (kind 3 ranks), fromJust (kind 2 ranks)])
+  | isKind 3 ranks && isKind 2 ranks  = (6, [kind 3 ranks, kind 2 ranks])
   | isFlush hand                      = (5, ranks)
-  | isStraight ranks                  = (4, [max ranks])
-  | isJust (kind 3 ranks)             = (3, fromJust (kind 3 ranks) : ranks)
-  | isTowPair ranks                   = (2, (twoPair ranks) ++ ranks)
+  | isStraight ranks                  = (4, [maximum ranks])
+  | isKind 3 ranks                    = (3, kind 3 ranks : ranks)
+  | isTwoPair ranks                   = (2, twoPair ranks ++ ranks)
   | isKind 2 ranks                    = (1, kind 2 ranks : ranks)
   | otherwise                         = (0, ranks)
     where ranks = cardRanks hand
 
+
+---- example: [14, 14, 4, 4, 2]
 cardRanks :: Hand -> [Rank]
-cardRanks hand = [5,4,3,2,1] if ranks == [14,5,4,3,2] else ranks
-  where reverse . sort  $ map (fromJust . (`elemIndex` "--23456789TJQKA") . head) hand
+cardRanks hand
+  | rank == [14,5,4,3,2] = [5,4,3,2,1]
+  | otherwise            = rank
+    where rank = reverse . sort  $ map (fromJust . (`elemIndex` "--23456789TJQKA") . head) hand
 
 isFlush :: Hand -> Bool
 isFlush hand = length (nub suits) == 1
   where suits = map last hand
 
-isStraight :: Ranks -> Bool
+isStraight :: [Rank] -> Bool
 isStraight ranks = maximum ranks - minimum ranks == 4 && length (nub ranks) == 5 
 
-kind :: Int -> [Rank] -> Maybe [Rank]
+kind :: Int -> [Rank] -> Rank
+kind n ranks
+  | null outcome = 0
+  | otherwise    = head outcome
+    where outcome = dropWhile (\x -> count x ranks /= n) ranks
 
-twoPair :: [Rank] -> Maybe [Rank]
+twoPair :: [Rank] -> [Rank]
+twoPair ranks
+  | 0 /= highPair && highPair /= lowPair  = [highPair, lowPair]
+  | otherwise                             = []
+    where highPair = kind 2 ranks
+          lowPair  = kind 2 (reverse ranks)
 
-
-
-def kind(n, ranks):
-    """Return the first rank that this hand has exactly n-of-a-kind of.
-    Return None if there is no n-of-a-kind in the hand."""
-    for r in ranks:
-        if ranks.count(r) == n: return r
-    return None
-
-
-def two_pair(ranks):
-    "If there are two pair here, return the two ranks of the two pairs, else None."
-    pair = kind(2, ranks)
-    lowpair = kind(2, list(reversed(ranks)))
-    if pair and lowpair != pair:
-        return (pair, lowpair)
-    else:
-        return None
+isKind n ranks    = 0 /= kind n ranks
+isTwoPair ranks = not . null $ twoPair ranks
 
 
-def read_data(s):
-    hands = s.rstrip().split(" ")
-    return (hands[:5], hands[5:])
+---- utilities
+count :: Int -> [Int] -> Int
+count x xs = length $ filter (== x) xs
 
-
-if __name__ == '__main__':
-    with open(sys.argv[1], 'r') as f:
-        data = [read_data(s) for s in f if s.rstrip()]
-    for (left, right) in data:
-        print poker(left, right)
+main = do 
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = [ splitAt 5 (words line) | line <- lines contents]
+  let outputs = [poker hand1 hand2 | (hand1, hand2) <- inputs ]
+  mapM_ putStrLn outputs

@@ -49,69 +49,60 @@ Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, ad
 -}
 
 import System.Environment (getArgs)
-import Data.List (isInfixOf, isPrefixOf, isSuffixOf, delete, sort)
-import GHC.Exts (sortWith)
-
-
-split :: Char -> String -> [String]
-split c s = 
-  case dropWhile (== c) s of
-    "" -> []
-    s' -> w : split c s''
-      where (w, s'') = break (== c) s'
-
+import Data.List (delete)
+import Data.Text (Text, append, pack, unpack, splitOn)
+import qualified Data.Text as T
 
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
 combinations _ [] = []
-combinations n xs  
-  | n == 1    = map (:[]) xs 
-  | otherwise = helper n (length xs) xs    
+combinations 1 xs = map (:[]) xs 
+combinations n xs = helper n (length xs) xs
+  where
+    helper k l ys@(z:zs)        
+      | k < l     = map (z :) (combinations (k-1) zs) ++ combinations k zs
+      | k == l    = [ys]
+      | otherwise = []
+
+overlapLength :: [Text] -> Int
+overlapLength [s1, s2]
+  | T.isInfixOf sm lg = T.length sm
+  | otherwise         = max (helper T.isPrefixOf T.tail sm lg) (helper T.isSuffixOf T.init sm lg)
     where
-      helper k l ys@(z:zs)        
-        | k < l     = map (z :) (combinations (k-1) zs)
-                         ++ combinations k zs
-        | k == l    = [ys]
-        | otherwise = []
+      [lenS1, lenS2] = map T.length [s1, s2]
+      (sm, lg) = if lenS1 <= lenS2 then (s1, s2) else (s2, s1)
+      helper :: (Text -> Text -> Bool) -> (Text -> Text) -> Text -> Text -> Int
+      helper f next xs ys
+        | f (next xs) ys   = (T.length xs - 1)
+        | otherwise        = helper f next (next xs) ys
 
 
-overlapLength :: [String] -> Int
-overlapLength ss
-  | sm `isInfixOf` lg = length sm
-  | otherwise       = max (helper isPrefixOf tail sm lg) (helper isSuffixOf init sm lg)
+merge :: Int -> Text -> Text -> Text
+merge n s1 s2
+  | n > lenSm                            = error "something is VERY wrong!"
+  | n == lenSm                           = lg
+  | T.take n sm == T.drop (lenLg - n) lg = append lg (T.drop n sm)
+  | T.take n lg == T.drop (lenSm - n) sm = append sm (T.drop n lg)
+  | otherwise                            = error "something is wrong!"
     where
-      [sm, lg] = sortWith length ss
-      helper :: ([a] -> [a] -> Bool) -> ([a] -> [a]) -> [a] -> [a] -> Int
-      helper f next xs ys = if f (next xs) ys then length xs - 1 else helper f next (next xs) ys
-
-
-merge :: String -> String -> Int -> String
-merge s1 s2 n
-  | n > lenSm                        = error "something is VERY wrong!"
-  | n == lenSm                       = lg
-  | take n sm == drop (lenLg - n) lg = lg ++ drop n sm
-  | take n lg == drop (lenSm - n) sm = sm ++ drop n lg
-  | otherwise                        = error "something is wrong!"
-    where
-      (lenS1, lenS2) = (length s1, length s2)
+      (lenS1, lenS2) = (T.length s1, T.length s2)
       (sm, lg) = if lenS1 < lenS2 then (s1, s2) else (s2, s1)
       lenSm = min lenS1 lenS2
       lenLg = max lenS1 lenS2
 
 
-daVyncy :: [String] -> String
+daVyncy :: [Text] -> Text
 daVyncy [x] = x
-daVyncy xs = 
-  daVyncy $ merge s1 s2 n : foldl (flip delete) xs [s1, s2]
-    where (n, [s1, s2]) = maximum $ map (\pair -> (overlapLength pair, pair)) $ combinations 2 xs
+daVyncy xs = daVyncy $ merge n s1 s2 : foldl (flip delete) xs [s1, s2]
+  where (n, [s1, s2]) = maximum $ map (\pair -> (overlapLength pair, pair)) $ combinations 2 xs
 
 
-reader :: String -> [String]
-reader = split ';'
+reader :: String -> [Text]
+reader s = splitOn (pack ";") (pack s)
 
 main = do 
     f:_ <- getArgs
     contents <- readFile f
     let inputs = map reader $ lines contents
     let outputs = map daVyncy inputs
-    mapM_ putStrLn outputs
+    mapM_ (putStrLn . unpack) outputs

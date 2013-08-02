@@ -28,6 +28,7 @@ Print results in the following way.
 
 -}
 import System.Environment (getArgs)
+import Data.Aeson.Parser
 
 sumIDsWithLabel 
 

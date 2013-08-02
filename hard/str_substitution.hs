@@ -28,24 +28,28 @@ For the curious, here are the transitions for the above example: 10011011001 => 
 -}
 
 import System.Environment (getArgs)
-import Data.Text (Text, pack, split, replace)
+import Data.Text (Text, pack, unpack, splitOn, intercalate)
 
-reshapeBy :: Int -> [Text] -> [[Text]]
-reshapeBy n xs = 
-  case splitAt n xs of
-    ([], _)  -> []
-    (ys,zs)  -> ys : reshapeBy n zs
+makePairs :: [a] -> [(a,a)]
+makePairs xs = 
+  case splitAt 2 xs of
+    ([], _)      -> []
+    ([a,b], zs)  -> (a, b) : makePairs zs
 
-strSubstitution :: Text -> [Text] -> Text
-strSubstitution = undefined
 
-reader :: String -> (Text, [Text])
-reader s = (former, split (==',') latter)
-  where [former, latter] = split (==';') (pack s)
+---- This replacement has recursive structure
+strSubstitution :: Text -> [(Text, Text)] -> Text
+strSubstitution target [] = target
+strSubstitution target ((from,to):xs) = intercalate to $ map (flip strSubstitution xs) (splitOn from target)
+
+
+reader :: String -> (Text, [(Text, Text)])
+reader s = (former, makePairs (splitOn (pack ",") latter))
+  where [former, latter] = splitOn (pack ";") (pack s)
 
 main = do
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map reader $ lines contents
   let outputs = [strSubstitution target rules | (target, rules) <- inputs]
-  mapM_ print outputs
+  mapM_ (putStrLn . unpack) outputs

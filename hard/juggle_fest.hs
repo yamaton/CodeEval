@@ -29,7 +29,7 @@ J J8 H:8 E:2 P:3 C1,C0,C2
 J J9 H:10 E:2 P:1 C1,C2,C0
 J J10 H:6 E:4 P:5 C0,C2,C1
 J J11 H:8 E:4 P:7 C0,C1,C2
-```
+  ```
 
 Output sample
 --------------
@@ -43,13 +43,19 @@ Run your program on the input which contains 2000 circuits and 12000 jugglers. T
 ```
 21
 ```
+
+
+[Comment]
+Related to Hospitals/Residents matching problem ?
+http://en.wikipedia.org/wiki/National_Resident_Matching_Program#Matching_algorithm
 -}
 
 import System.Environment (getArgs)
-data Performance = [Int]
-data Prefs = [Int]
-data Juggler = [(Performance, Prefs)]
-data Circuit = [Performance]
+
+type Performance = [Int]
+type Prefs = [Int]
+type Juggler = (Performance, Prefs)
+type Circuit = Performance
 
 splitOn :: Char -> String -> [String]
 splitOn c s = case dropWhile (== c) s of
@@ -57,15 +63,32 @@ splitOn c s = case dropWhile (== c) s of
   s' -> w : splitOn c s''
     where (w, s'') = break (== c) s'
 
-jugglerAssignment :: [Circuit] -> [Juggler] -> Int
-jugglerAssignment circuits jugglers = undefined
+score :: Circuit -> Juggler -> Int
+score cc (pp, _) = sum $ zipWith (*) cc pp
 
+
+jugglerAssignment :: [Circuit] -> [Juggler] -> [[Int]]
+jugglerAssignment circuits jugglers = undefined
+  where table = [[score c j | j <- jugglers] | c <- circuits]
+
+
+---- can be written much simpler if regex is available....
 reader :: String -> ([Circuit], [Juggler])
-reader s = undefined
+reader s = (circuits, jugglers)
+  where ss = filter (`notElem` "HEP:") s
+        circuits = map (map read . drop 2 . words) $ 
+                     filter (\(c:_) -> c == 'C') $ 
+                     filter (not . null)  $ lines ss
+        js = map (splitAt 3 . drop 2 . words) $ 
+                      filter (\(x:_) -> x == 'J') $
+                      filter (not . null) $ lines $ 
+                      filter (/= 'C') ss
+        jugglers = [(map read perfs, (map read . splitOn ',') order) | (perfs, order:_) <- js]
+
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
-  let (circuits, jugglers) = reader (lines contents)
+  let (circuits, jugglers) = reader contents
   let output = jugglerAssignment circuits jugglers
-  print output
+  print $ sum (output !! 1970)

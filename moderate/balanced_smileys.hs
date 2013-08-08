@@ -62,7 +62,7 @@ realizations text = concatMap (\(x:xs) -> foldl (\acc txt -> append <$> acc <*> 
     [smile, frown] = map pack [":)", ":("]
     (y:ys) = splitOn smile text :: [Text]
     textList  = foldl (\acc txt -> append <$> acc <*> [txt, smile `append` txt]) [y] ys :: [Text]
-    xxs = map (splitOn frown) textList :: [[Text]]
+    xxs = map (splitOn frown) textList
 
 
 isBalancedProperly :: Text -> Bool

@@ -50,19 +50,16 @@ Print out the number of expressions that evaluate to an ugly number for each tes
 -}
 
 import System.Environment (getArgs)
-import Control.Monad (replicateM, ap, foldM)
+import Control.Monad (ap, foldM)
 
 -- |
 -- >>> genNumbers [1,2,3]
 -- [6,2,0,-4]
 genNumbers :: [Int] -> [Int]
 genNumbers []     = []
---genNumbers (x:xs) = 
---  foldM (\n k -> [n + k, n - k]) x xs
-
+--genNumbers (x:xs) = foldM (\n k -> [n + k, n - k]) x xs
 ---- Slightly faster
-genNumbers (x:xs) = 
-  foldl (\acc n -> ap [(+n), \i -> i-n] acc) [x] xs
+genNumbers (x:xs) = foldl (\acc n -> ap [(+n), \i -> i-n] acc) [x] xs
 
 
 -- |
@@ -77,6 +74,7 @@ concatComb = foldr helper [[""]]
     f c (ss:yss) = (c:ss) : yss
     g c yss = [c] : yss
 
+
 ---- slightly slower
 --concatComb s = map words $ foldr helper [""] s
 --  where 
@@ -86,18 +84,19 @@ concatComb = foldr helper [[""]]
 --      where f cc ss = cc : ' ' : ss
 
 
+
 -- |
 -- >>> strToNumber [["123"], ["12", "3"], ["1", "23"], ["1", "2", "3"]]
 -- [[123],[12,3],[1,23],[1,2,3]]
 strToNumber :: [[String]] -> [[Int]]
-strToNumber xxs = [map read xs | xs <- xxs]
+strToNumber xxs = map (map read) xxs
 
 countUgly :: String -> Int
 countUgly s = length $ filter isUgly $ concatMap genNumbers $ (strToNumber . concatComb) s
 
 isUgly :: Int -> Bool
-isUgly n = any divisible [2,3,5,7]
-  where divisible k = n `mod` k == 0
+isUgly n = even n || any divisibleBy [3,5,7]
+  where divisibleBy k = n `mod` k == 0
 
 main = do 
   f:_ <- getArgs
@@ -105,4 +104,3 @@ main = do
   let inputs  = filter (not . null) $ lines contents
   let outputs = map countUgly inputs
   mapM_ print outputs
-

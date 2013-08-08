@@ -70,10 +70,10 @@ overlapLength :: [Text] -> Int
 overlapLength [s1, s2] 
   | T.isInfixOf s1 s2 = T.length s1
   | otherwise         = helper (T.tail s1)
-  where helper :: Text -> Int
-        helper xs
-          | T.isPrefixOf xs s2 = T.length xs
-          | otherwise          = helper (T.tail xs)
+    where 
+      helper xs
+        | T.isPrefixOf xs s2 = T.length xs
+        | otherwise          = helper (T.tail xs)
 
 
 merge :: Int -> Text -> Text -> Text

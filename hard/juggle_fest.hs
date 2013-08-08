@@ -47,20 +47,25 @@ Run your program on the input which contains 2000 circuits and 12000 jugglers. T
 
 import System.Environment (getArgs)
 data Performance = [Int]
-data Preference = [Int]
-data Juggler = [(Performance, Preference)]
+data Prefs = [Int]
+data Juggler = [(Performance, Prefs)]
 data Circuit = [Performance]
 
+splitOn :: Char -> String -> [String]
+splitOn c s = case dropWhile (== c) s of
+  "" -> []
+  s' -> w : splitOn c s''
+    where (w, s'') = break (== c) s'
+
+jugglerAssignment :: [Circuit] -> [Juggler] -> Int
+jugglerAssignment circuits jugglers = undefined
 
 reader :: String -> ([Circuit], [Juggler])
-reader s = 
+reader s = undefined
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
-  let input = reader (lines contents)
-  let output = jugglerAssignment input
+  let (circuits, jugglers) = reader (lines contents)
+  let output = jugglerAssignment circuits jugglers
   print output
-
-
-

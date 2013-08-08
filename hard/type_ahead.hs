@@ -54,11 +54,6 @@ Bonus points for:
 1. Making it able to dynamically add new corpus data. 
 2. Allow reverse ngram lookups to find what words commonly precede words/phrases
 
-
-[TODOs]
-For some reason the program does not pass with 100 score.
-I have some misunderstandings in the specification.
-
 -}
 
 import System.Environment (getArgs)
@@ -73,8 +68,8 @@ split c s = case dropWhile (== c) s of
     where (w, s'') = break (== c) s'
 
 
-process :: String -> (Int, String) -> (String, Double)
-process text (n, s) = undefined
+processor :: String -> (Int, String) -> (String, Double)
+processor text (n, s) = undefined
 
 
 reader :: String -> (Int, String)
@@ -97,5 +92,6 @@ And so the teacher turned it out, but still it lingered near,
 And waited patiently about till Mary did appear.
 \"Why does the lamb love Mary so?\" the eager children cry;
 \"Why, Mary loves the lamb, you know\" the teacher did reply."
-  let outputs = map (process text) inputs
+
+  let outputs = map (processor text) inputs
   mapM_ (putStrLn . formetter) outputs

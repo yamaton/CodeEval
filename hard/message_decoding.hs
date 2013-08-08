@@ -83,10 +83,13 @@ def decode(s):
 
 
 
+
+
+
 main = do 
-    f:_ <- getArgs
-    contents <- readFile f
-    let inputs = lines contents
-    let outputs = map decode inputs
-    mapM_ putStrLn outputs
+  f:_ <- getArgs
+  contents <- readFile f
+  let inputs = lines contents
+  let outputs = map decode inputs
+  mapM_ putStrLn outputs
 

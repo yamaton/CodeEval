@@ -120,7 +120,8 @@ countSquareSums :: Int -> Int
 countSquareSums 0 = 1
 countSquareSums n = (total + flg) `div` 2
   where
-    total = sum [1 | i <- divisors n, i `mod` 4 == 1] - sum [1 | i <- divisors n, i `mod` 4 == 3]
+    ds = divisors n
+    total = sum [1 | i <- ds, i `mod` 4 == 1] - sum [1 | i <- ds, i `mod` 4 == 3]
     flg = (if isSquare n then 1 else 0) + (if even n && isSquare (n `div` 2) then 1 else 0)
 
 

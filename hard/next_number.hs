@@ -59,18 +59,6 @@ def next_number(n):
         return fromdigits([head] + [0]*(zerocount+1) + rest)
 
 
-def test():
-    assert next_lexicographic_permutation("1081021") == list("1081102")
-    assert next_lexicographic_permutation("211") == None
-    assert next_number(105) == 150
-    
-    assert next_number(115) == 151
-    assert next_number(511) == 1015
-    assert next_number(1501) == 1510
-    assert next_number(52110) == 100125
-    print "passed all tests!"
-
-
 main = do 
   f:_ <- getArgs
   contents <- readFile f

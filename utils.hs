@@ -178,12 +178,12 @@ factorInteger 0 = [(0, 1)]
 factorInteger 1 = [(1, 1)]
 factorInteger n = tally $ factor n
   where
-    primes = (primesTo . round . sqrt . fromIntegral) n
+    ps = (primesTo . round . sqrt . fromIntegral) n
     factor 1 = []
     factor p = k : factor (p `div` k)
       where 
-        divisors = dropWhile (\q -> p `mod` q /= 0) primes
-        k = if null divisors then p else head divisors
+        ds = dropWhile (\q -> p `mod` q /= 0) ps
+        k = if null ds then p else head ds
 
 -- | 
 -- >>> divisors 24

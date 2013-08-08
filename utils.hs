@@ -231,6 +231,17 @@ intToBin :: Int -> String
 intToBin n = showIntAtBase 2 intToDigit n ""
 
 
+-- | Binary string to Int
+-- >>> binToInt "1100100"
+-- 100
+binToInt :: String -> Int
+binToInt xs = sum $ zipWith (*) digits pows
+  where 
+    n = length xs
+    pows = map (2^) $ reverse [0 .. n - 1]
+    digits = map (read . (:[])) xs
+
+
 -- | Hex string to integer
 -- >>> hexToInt "ffffff"
 -- 16777215
@@ -238,6 +249,8 @@ intToBin n = showIntAtBase 2 intToDigit n ""
 -- 171
 hexToInt :: String -> Int
 hexToInt = fst . head . readHex
+
+
 
 
 -- | Conunt elements in list

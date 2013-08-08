@@ -1,3 +1,4 @@
+import System.Environment (getArgs)
 import Data.Text (replace, pack, unpack)
 
 repl' :: String -> String -> String -> String
@@ -19,6 +20,7 @@ snippet xs = xs ++ "\nimport System.Environment (getArgs)\n\nmain = do\n"
                 ++ "  let input = lines contents\n\n\n"
 
 main = do 
-  input <- getContents
+  f:_ <- getArgs
+  input <- readFile f
   putStr $ ( snippet . commentOut . fixOutput . fixInput . fixDescription . fixTitle . removeLinkedIn) input
 

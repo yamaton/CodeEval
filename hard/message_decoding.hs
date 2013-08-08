@@ -38,58 +38,55 @@ For each data set, your program must write its decoded message on a separate lin
 ```
 ##*\$
 ```
-2^n - n
 
 -}
 
 import System.Environment (getArgs)
 
-
-takeHeader :: String -> String
-takeHeader = takeWhile (`notElem` "01")
-
-
-
-def dictkey(header):
-    d = {}
-    size = 1
-    cnt = 0
-    for c in header:
-        if cnt == 2 ** size - 1:
-            cnt = 0
-            size += 1
-        d[(size, cnt)] = c
-        cnt += 1
-    return d
+-- | Binary string to Int
+-- >>> binToInt "1100100"
+-- 100
+binToInt :: String -> Int
+binToInt xs = sum $ zipWith (*) digits pows
+  where 
+    n = length xs
+    pows = map (2^) $ reverse [0 .. n - 1]
+    digits = map (read . (:[])) xs
 
 
-def decode(s):
-    header = take_header(s)
-    d = dictkey(header)
-    body = s[len(header):]
-    decoded = []
-
-    while 1:
-        size, body = int(body[:3], 2), body[3:]
-        if size == 0:
-            break
-
-        while 1:
-            s, body = body[:size], body[size:]
-            if s == '1' * size:
-                break
-            decoded.append(d[(size, int(s, 2))])
-    return "".join(decoded)
+dictKey :: String -> String -> Char
+dictKey header code = header !! n
+  where 
+    size = length code
+    count = binToInt code
+    --- this relation comes from sum_{i=1}^{size - 1} (2^i -1)
+    n =  2 ^ size - size - 1 + count
 
 
 
+processor :: String -> String
+processor s = map (dictKey header) codes
+  where 
+    (header, message) = break (`elem` "01") s
+    codes = extractCodes message
 
+
+extractCodes :: String -> [String]
+extractCodes xs
+  | size == 0 = []
+  | otherwise = codes ++ extractCodes zs
+    where
+      size = binToInt $ take 3 xs
+      rest = drop 3 xs
+      _:out = takeWhile (\(a, b) -> a /= replicate size '1') $ iterate (splitAt size . snd) ("", rest)
+      codes = map fst out
+      zs = (drop size . snd . last) out 
 
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = lines contents
-  let outputs = map decode inputs
+  let outputs = map processor inputs
   mapM_ putStrLn outputs
 

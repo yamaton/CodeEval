@@ -5,6 +5,7 @@
 *.hi
 *.o
 *.exe
+*.prof
 
 # C extensions
 *.so

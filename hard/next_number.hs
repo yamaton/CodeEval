@@ -17,6 +17,7 @@ For each line of input, generate a line of output which is the next integer in t
 -}
 
 import System.Environment (getArgs)
+import Data.List (sort)
 
 integerDigits :: Int -> [Int]
 integerDigits n = map (read . (:[])) (show n)
@@ -25,44 +26,34 @@ fromDigits :: [Int] -> Int
 fromDigits xs = read $ concatMap show xs
 
 
-def next_lexicographic_permutation(iterable):
-    """
-    Next lexicographic permutation is generated in list. 
-    """
-    x = list(iterable)
-    try:
-        k = max(i for i in range(len(x)-1) if x[i] < x[i+1])
-    except ValueError:
-        return None
-    
-    l = max(j for j in range(k+1, len(x)) if x[k] < x[j])
-    x[k], x[l] = x[l], x[k]
-    upper = x[:k+1]
-    lower = x[k+1:]
-    lower.reverse()
-    return upper + lower
+---- this is mindless translation from python code
+nextLexicographicPermutation :: Ord a => [a] -> [a]
+nextLexicographicPermutation xs
+  | null ks    = []
+  | otherwise = upper ++ reverse lower
+    where
+      ks = filter (\i -> xs !! i < xs !! (i + 1)) [0 .. length xs - 2]
+      k = last ks
+      l = last $ filter (\j -> xs !! k < xs !! j) [k + 1 .. length xs - 1]
+      ys = first ++ [xs !! l] ++ second ++ [xs !! k] ++ third
+        where (former, _:third) = splitAt l xs
+              (first, _:second) = splitAt k former
+      (upper, lower) = splitAt (k+1) ys
 
 
-def next_number(n):
-    """
-    Treat nonzero numbers and zero numbers separately.
-    """
-    digits = integerdigits(n)
-    x = next_lexicographic_permutation(digits)
-    if x:
-        return fromdigits(x)
-    else:
-        zerocount = digits.count(0)
-        nonzero_digits = [d for d in sorted(digits) if d > 0]
-        head = nonzero_digits[0]
-        rest = nonzero_digits[1:] 
-        return fromdigits([head] + [0]*(zerocount+1) + rest)
-
+nextNumber :: Int -> Int
+nextNumber n
+  | null nextDigits = fromDigits $ [y] ++ replicate (zeroCount + 1) 0 ++ ys
+  | otherwise       = fromDigits nextDigits
+    where xs = integerDigits n
+          nextDigits = nextLexicographicPermutation xs 
+          y:ys = sort $ filter (> 0) xs
+          zeroCount = length $ filter (== 0) xs
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
-  let inputs = lines contents
+  let inputs = map read $ lines contents
   let outputs = map nextNumber inputs
   mapM_ print outputs
 

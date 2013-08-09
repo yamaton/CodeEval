@@ -83,6 +83,13 @@ tally :: Ord a => [a] -> [(a, Int)]
 tally xs = toList $ fromListWith (+) [(x, 1)| x <- xs]
 
 
+-- Frequencies (yet another implementation of tally)
+frequencies :: Ord a => [a] -> [(a, Int)]
+frequencies xs = drop
+  x <- group $ sort xs
+  return (head x, length x)
+
+
 -- | Fibonacci number
 -- >>> fibonacci 10
 -- 55
@@ -249,7 +256,6 @@ binToInt xs = sum $ zipWith (*) digits pows
 -- 171
 hexToInt :: String -> Int
 hexToInt = fst . head . readHex
-
 
 
 

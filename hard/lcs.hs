@@ -27,16 +27,15 @@ MJAU
 
 import System.Environment (getArgs)
 
-
-split :: Char -> String -> [String]
-split c s = case dropWhile (== c) s of
+splitOn :: Char -> String -> [String]
+splitOn c s = case dropWhile (== c) s of
   "" -> []
-  s' -> w : split c s''
+  s' -> w : splitOn c s''
     where (w, s'') = break (== c) s'
 
 
-lcsLengthMatrix :: String -> String -> [[Int]]
-lcsLengthMatrix s t = 
+lcsLengthMatrix :: String -> String -> (Int, Int) -> Int
+lcsLengthMatrix s t (i, j) = 
   where
     lenS = length s
     lenT = length t
@@ -50,6 +49,6 @@ lcs s t = backtrack mat s t (length s - 1) (length t - 1)
 main = do 
   f:_ <- getArgs
   contents <- readFile f
-  let inputs = map (split ';') $ lines contents
+  let inputs = map (splitOn ';') $ lines contents
   let outputs = [lcs s t | [s,t] <- inputs]
   mapM_ putStrLn outputs

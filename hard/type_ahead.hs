@@ -60,21 +60,30 @@ import System.Environment (getArgs)
 import Data.List (intercalate)
 import Text.Printf (printf)
 
+-- >>> tallyProb "aaaddbcdabbbaf"
+-- [('a',5/14),('b',4/14),('c',1/14),('d',3/14),('f',1/14)]
+tallyProb :: [(String, String)] -> String -> Maybe [(String, Double)]
+tallyProb xs s = lookup s zs
+  where ys = toList $ fromListWith (+) [(x, 1)| x <- xs]
+        n  = length xs
+        zs = [(preceding, (following, fromIntegral cnt / fromIntegral n)) | ((preceding, following), cnt) <- ys] 
 
-split :: Char -> String -> [String]
-split c s = case dropWhile (== c) s of
+splitOn :: Char -> String -> [String]
+splitOn c s = case dropWhile (== c) s of
   "" -> []
-  s' -> w : split c s''
+  s' -> w : splitOn c s''
     where (w, s'') = break (== c) s'
-
 
 processor :: String -> (Int, String) -> (String, Double)
 processor text (n, s) = undefined
 
+genNgram :: String -> Int -> String -> Maybe Double
+genNgram text n = tallyProb (zip (init ws) (tail ws))
+  where ws = words text
 
 reader :: String -> (Int, String)
 reader s = (read former, latter)
-    where [former, latter] = split ',' s
+    where [former, latter] = splitOn ',' s
 
 formatter :: [(String, Double)] -> String
 writer xs = intercalate ";" [printf "%s,%.3f" s prob | (s, prob) <- xs] 

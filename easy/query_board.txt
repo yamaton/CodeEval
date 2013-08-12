@@ -8,3 +8,7 @@ SetCol 14 0
 QueryRow 15
 SetRow 10 1
 QueryCol 2
+SetRow 13 3
+SetCol 3 2
+QueryCol 3
+QueryRow 11

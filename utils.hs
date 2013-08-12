@@ -108,7 +108,8 @@ fibonacci n = flip evalState (0,1) $ do
 -- >>> integerDigits 41531
 -- [4,1,5,3,1]
 integerDigits :: Int -> [Int]
-integerDigits n = map (read . (:[])) (show n)
+--integerDigits n = map (read . (:[])) (show n)
+integerDigits = map (`mod` 10) . takeWhile (> 0) . iterate (`div` 10) 
 
 
 -- | Digits to integer

@@ -27,7 +27,7 @@ type Coord = (Int, Int)
 -- >>> digitSum 5979
 -- 30
 digitSum :: Int -> Int
-digitSum = sum . map (read . (:[])) . show
+digitSum = sum . map (`mod` 10) . takeWhile (> 0) . iterate (`div` 10) 
 
 isAccessible :: Coord -> Bool
 isAccessible (x, y) = isInDomain && isDigitSumOK
@@ -44,8 +44,11 @@ scanGrid = scanHelper [(0, 0)] [(0, 0)]
     scanHelper ((x,y):stack) visited 
       | null nextAllowed = scanHelper stack visited
       | otherwise        = scanHelper (nextAllowed ++ stack) (nextAllowed ++ visited)
-        where nextAllowed = filter (\p -> p `notElem` visited && isAccessible p) [(x+1, y), (x, y+1)]
+        where nextAllowed = filter (\p -> isAccessible p && p `notElem` visited) (nextPos (x,y))
 
+
+nextPos :: Coord -> [Coord]
+nextPos (x,y) = [(x+1, y), (x, y+1)]
 
 ---- - 1 / + 1 : excluding the coordinate (0,0) first and then add it later
 adjustCount :: [Coord] -> Int

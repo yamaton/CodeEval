@@ -1,4 +1,6 @@
 {-
+Peak Traffic
+=============
 Credits: This challenge is from the facebook engineering puzzles
 
 Facebook is looking for ways to help users find out which friends they interact with the most on the site. Towards that end, you have collected data from your friends regarding who they interacted with on the site. Each piece of data represents a desirable but one-way interaction between one user of Facebook towards another user of Facebook. By finding groups of users who regularly interact with one another, you hope to help users determine who among their friends they spend the most time with online.
@@ -24,6 +26,7 @@ Thu Dec 11 17:53:10 PST 2008    f@facebook.com    d@facebook.com
 Thu Dec 11 17:53:11 PST 2008    e@facebook.com    f@facebook.com
 Thu Dec 11 17:53:12 PST 2008    f@facebook.com    e@facebook.com
 ```
+
 Every line in the input file will follow this format, you are guaranteed that your submission will run against well formed input files.
 
 Output sample
@@ -35,6 +38,7 @@ Your program should print to standard out, exactly one cluster per line. Each cl
 a@facebook.com, b@facebook.com, c@facebook.com
 d@facebook.com, e@facebook.com, f@facebook.com
 ```
+
 Finally, any cluster that is a sub-cluster (in other words, all users within one cluster are also present in another) must be removed from the output. For this case, your program should only print the largest super-cluster that includes the other clusters. Your program must be fast, efficient, and able to handle extremely large input files.
 
 
@@ -44,66 +48,31 @@ Finally, any cluster that is a sub-cluster (in other words, all users within one
 
 
 import System.Environment (getArgs)
+import Data.Set (Set)
+import qualified Data.Set as Set
+
+type Graph = Set (String, String)
+
+toUEGraph :: [[String, String]] -> Graph
+toUEGraph xs = Set.filter (\(a,b) -> (b, a) `Set.member` ys) zs
+  where ys = Set.fromList [(a,b) | [a,b] <- xs]
+        zs = Set.fromList [(a,b) | [a,b] <- map sort xs]
+
+bronKerbosch :: Graph -> Graph -> Graph -> [Graph]
+bronKerbosch r (Set ()) (Set ()) = r
+bronKerbosch r p x = undefined
 
 
-def de2ue(edges):
-    """Transform directed edges into undirected edges by keeping bi-directional edges only."""
-    return set(de for de in edges if tuple(reversed(de)) in edges)
+reader :: String -> (String, String)
+reader s = (s1, s2)
+  where 
+    xs = words s 
+    [s1, s2] = drop (length xs - 2) xs
 
 
-def BronKerbosch1(R, P, X):
-    """
-    Bron-Kerbosch Algorithm
-
-    Initially,
-    R ... empty set (maximal clique to be determined as R)
-    X ... empty set
-    P ... node set of the graph
-    """
-    if (not P) and (not X):
-        return R
-    for v in P:
-        BronKerbosch1(R.add(v), P.update & neighbors(v), X & neighbors(v))
-        P.remove(v)
-        X.add(v)
-
-
-def BronKerbosch2(R, P, X):
-    """
-    Bron-Kerbosch Algorithm
-
-    Initially,
-    R ... empty set (maximal clique to be determined as R)
-    X ... empty set
-    P ... node set of the graph
-    """
-    if (not P) and (not X):
-        return R
-    ## choose a node u from (P | X) ?
-    for v in (P-neighbors(u)):
-        BronKerbosch2( R.add(v), P & neighbors(v), X & neighbors())
-        P.remove(v)
-        X.add(v)
-
-
-def BronKerbosch3(G):
-    """
-    Bron-Kerbosch Algorithm
-
-    Initially,
-    R ... empty set (maximal clique to be determined as R)
-    X ... empty set
-    P ... node set of the graph
-    """
-    P = V(G)
-    R = X = set()
-    for v in P:
-        BronKerbosch2(R.add(v), P & neighbors(v), X & neighbors(v))
-        P.remove(v)
-        X.add(v)
-
-
-if __name__ == '__main__':
-    with open(sys.argv[1], "r") as f:
-        data = set(tuple(line.rstrip().split("\t")[1:]) for line in f if line.rstrip())
-    print de2ue(data)
+main = do
+  f:_ <- getArgs 
+  contents <- readFile f
+  let input = map reader $ lines contents
+  let output = process input
+  mapM_ print output

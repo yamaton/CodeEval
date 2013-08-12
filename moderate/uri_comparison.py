@@ -2,9 +2,9 @@
 # encoding: utf-8
 """
 URI Comparison
-
-Description:
-
+==============
+Description
+------------
 Determine if two URIs match. For the purpose of this challenge, you should use a case-sensitive octet-by-octet comparison of the entire URIs, with these exceptions:
 
 1. A port that is empty or not given is equivalent to the default port of 80
@@ -12,22 +12,26 @@ Determine if two URIs match. For the purpose of this challenge, you should use a
 3. Comparisons of scheme names MUST be case-insensitive
 4. Characters are equivalent to their % HEX HEX encodings. (Other than typical reserved characters in urls like /,?,@,:,&,= etc)
 
-Input sample:
-
+Input sample
+------------
 Your program should accept as its first argument a path to a filename. Each line in this file contains two urls delimited by a semicolon. e.g.
-
+```
 http://abc.com:80/~smith/home.html;http://ABC.com/%7Esmith/home.html
+```
 
-Output sample:
-
+Output sample
+--------------
 Print out True/False if the URIs match. e.g.
-
+```
 True
+```
+
 """
 import sys
-from urllib2 import unquote
-from urlparse import urlparse
+from urlparse import urlparse, unquote
 
+
+## `urlparse` returns lowercase string as `scheme` and `hostname` attributes
 def compare_uri(s, t):
     """
     Excluding username and password 
@@ -43,12 +47,8 @@ def compare_uri(s, t):
             tmp = tmp if tmp else 80
         x.myport = tmp
 
-    return (sss.scheme.lower() == ttt.scheme.lower() and
-        sss.hostname.lower() == ttt.hostname.lower() and
-        sss.username == ttt.username and
-        sss.password == ttt.password and
-        sss.path == ttt.path and
-        sss.myport == ttt.myport )
+    return all([sss.__getattribute__(f) == ttt.__getattribute__(f) for f in 
+                 ['scheme', 'hostname', 'username', 'password', 'path', 'myport']])
 
 
 if __name__ == '__main__':

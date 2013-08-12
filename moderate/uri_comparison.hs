@@ -41,8 +41,7 @@ split c s = case dropWhile (== c) s of
 ---- [TODO] Replace `fromJust` with Monad operation
 isEquivalentURI :: String -> String -> Bool
 isEquivalentURI s t = all (\f -> f ss == f tt) [port, host, scheme, users, path, query, fragment]
-  where ss = (fromJust . parseURI . unEscapeString) s
-        tt = (fromJust . parseURI . unEscapeString) t
+  where [ss, tt] = map (fromJust . parseURI . unEscapeString) [s, t]
         port = portModify . uriPort . fromJust . uriAuthority
         host = map toLower . uriRegName . fromJust . uriAuthority        
         scheme = map toLower . uriScheme
@@ -62,3 +61,4 @@ main = do
   let inputs = map (split ';') $ lines contents
   let outputs = [isEquivalentURI s1 s2 | [s1, s2] <- inputs]
   mapM_ print outputs
+

@@ -46,33 +46,37 @@ For each query, output the answer of the query. E.g.
 ```
 -}
 
+---- [TODO] make the data structure into Array to speed up the computation
+
 import System.Environment (getArgs)
 import Data.List (transpose)
-import Control.Monad.State (State, runState, get, put)
+import Control.Monad (forM_)
+import Control.Monad.State (State, runState, evalState, get, put)
 
 data Command = SetCol | SetRow | QueryCol | QueryRow deriving (Read, Show)
 
 initialBoard :: [[Int]]
 initialBoard = replicate 256 $ replicate 256 0
 
-queryBoard :: [(Command, [Int])] -> ([[Int]], [Int])
-queryBoard commands = snd $ flip runState (initialBoard, []) $ do
-  --(com, x:xs) <- commands --- problem ! 
-  let (com, x:xs) = head commands
+queryBoard :: [(Command, [Int])] -> [Int]
+queryBoard commands = flip evalState (initialBoard, []) $ do
+  forM_ commands $ \(com, xs) -> do
+    (board, out) <- get
+    case (com, xs) of 
+      (SetRow, [i,x]) -> put (setRow i x board, out)
+      (SetCol, [i,x]) -> put (setCol i x board, out)
+      (QueryRow, [i]) -> put (board, queryRow i board : out)
+      (QueryCol, [i]) -> put (board, queryCol i board : out)
   (board, out) <- get
-  case com of 
-    SetRow   -> put (setRow x (head xs) board,  out)
-    SetCol   -> put (setCol x (head xs) board,  out)
-    QueryRow -> put (board,   queryRow x board : out)
-    QueryCol -> put (board,   queryCol x board : out)
-
+  return out
 
 setRow :: Int -> Int -> [[Int]] -> [[Int]]
 setRow i x mat = take i mat ++ [replicate m x] ++ drop (i + 1) mat
   where m = length (head mat)
 
 setCol :: Int -> Int -> [[Int]] -> [[Int]]
-setCol j x mat = transpose $ setRow j x (transpose mat)
+--setCol i x mat = transpose $ setRow i x (transpose mat)   ---- Data.List.transpose is slow!
+setCol i x mat = [take i xs ++ (x : drop (i + 1) xs) | xs <- mat]
 
 queryRow :: Int -> [[Int]] -> Int
 queryRow i mat = sum $ mat !! i
@@ -89,4 +93,4 @@ main = do
   contents <- readFile f
   let inputs = map parser $ lines contents
   let outputs = queryBoard inputs
-  print outputs
+  mapM_ print $ reverse outputs

@@ -21,6 +21,9 @@ Print the number of points the monkey can access. It should be printed as an int
 Restrict ourselves in 1/8 of the x-y plane only (0<=y<=x) due to the symmetry.
 
 -}
+import Data.Set (Set)
+import qualified Data.Set as Set
+
 type Coord = (Int, Int)
 
 -- |
@@ -37,14 +40,14 @@ isAccessible (x, y) = isInDomain && isDigitSumOK
 
 
 scanGrid :: [Coord]
-scanGrid = scanHelper [(0, 0)] [(0, 0)]
+scanGrid = scanHelper [(0, 0)] (Set.fromList [(0, 0)])
   where 
-    scanHelper :: [Coord] -> [Coord] -> [Coord]
-    scanHelper []            visited = visited
+    scanHelper :: [Coord] -> Set Coord -> [Coord]
+    scanHelper []            visited = Set.toList visited
     scanHelper ((x,y):stack) visited 
       | null nextAllowed = scanHelper stack visited
-      | otherwise        = scanHelper (nextAllowed ++ stack) (nextAllowed ++ visited)
-        where nextAllowed = filter (\p -> isAccessible p && p `notElem` visited) (nextPos (x,y))
+      | otherwise        = scanHelper (nextAllowed ++ stack) (Set.union (Set.fromList nextAllowed) visited)
+        where nextAllowed = filter (\p -> isAccessible p && p `Set.notMember` visited) (nextPos (x,y))
 
 
 nextPos :: Coord -> [Coord]

@@ -12,3 +12,27 @@ SetRow 13 3
 SetCol 3 2
 QueryCol 3
 QueryRow 11
+SetCol 132 2
+SetRow 135 38
+SetRow 118 1
+QueryCol 151
+SetCol 202 13
+QueryRow 110
+SetCol 143 -2
+QueryRow 152
+SetRow 101 1
+QueryCol 202
+SetRow 139 3
+SetCol 3 2
+QueryCol 3
+SetCol 203 2
+QueryCol 32
+QueryRow 221
+SetCol 232 2
+SetRow 232 38
+SetRow 218 1
+QueryCol 251
+SetCol 212 13
+QueryRow 10
+SetCol 243 -2
+QueryRow 245

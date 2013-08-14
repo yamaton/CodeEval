@@ -1,6 +1,6 @@
 {-
-lcs.hs
-
+Largest Common Substring
+========================
 Created by Yamato Matsuoka on 2013-07-12.
 
 Description
@@ -26,6 +26,7 @@ MJAU
 -}
 
 import System.Environment (getArgs)
+import Data.Array (Array, array, (!))
 
 splitOn :: Char -> String -> [String]
 splitOn c s = case dropWhile (== c) s of
@@ -34,17 +35,34 @@ splitOn c s = case dropWhile (== c) s of
     where (w, s'') = break (== c) s'
 
 
-lcsLengthMatrix :: String -> String -> (Int, Int) -> Int
-lcsLengthMatrix s t (i, j) = 
-  where
-    lenS = length s
-    lenT = length t
-    nextRow row = scanl (\acc (i, x) ->   ) 0 xs
-      where xs = zip [0 .. length row - 1] row 
+lcsLengthMatrix :: String -> String -> Array (Int, Int) Int
+lcsLengthMatrix s t = mat
+  where 
+    (lenS, lenT) = (length s, length t)
+    mat = array ((0,0),(lenS,lenT)) 
+       (   [((i,0),0) | i <- [0 .. lenS]] 
+        ++ [((0,j),0) | j <- [0 .. lenT]] 
+        ++ [(
+          (i+1,j+1),
+          if s !! i == t !! j 
+            then (mat ! (i,j)) + 1
+            else max (mat ! (i+1, j)) (mat ! (i, j+1))
+            )
+          | i <- [0..lenS-1], j <- [0..lenT-1]] )
+
+
+backtrack :: Array (Int, Int) Int -> String -> String -> Int -> Int -> String
+backtrack ar s1 s2 i j
+  | i == -1 || j == -1          = ""
+  | s1 !! i == s2 !! j          = backtrack ar s1 s2 (i-1) (j-1) ++ [s1 !! i]
+  | ar ! (i+1,j) > ar ! (i,j+1) = backtrack ar s1 s2  i    (j-1)
+  | otherwise                   = backtrack ar s1 s2 (i-1)  j
+
 
 lcs :: String -> String -> String
 lcs s t = backtrack mat s t (length s - 1) (length t - 1)
   where mat = lcsLengthMatrix s t
+
 
 main = do 
   f:_ <- getArgs

@@ -59,14 +59,15 @@ Bonus points for:
 import System.Environment (getArgs)
 import Data.List (intercalate)
 import Text.Printf (printf)
+import Data.Char (isAlpha, isSpace)
+import qualified Data.Map as M
+import GHC.Exts (sortWith)
 
--- >>> tallyProb "aaaddbcdabbbaf"
--- [('a',5/14),('b',4/14),('c',1/14),('d',3/14),('f',1/14)]
-tallyProb :: [(String, String)] -> String -> Maybe [(String, Double)]
-tallyProb xs s = lookup s zs
-  where ys = toList $ fromListWith (+) [(x, 1)| x <- xs]
-        n  = length xs
-        zs = [(preceding, (following, fromIntegral cnt / fromIntegral n)) | ((preceding, following), cnt) <- ys] 
+tallyProb :: [([String], String)] -> [String] -> [(String, Double)]
+tallyProb xs ss = [(following, fromIntegral cnt / fromIntegral n) | (following, cnt) <- qs] 
+  where ps = filter ((== ss) . fst) xs
+        qs = M.toList $ M.fromListWith (+) [(x, 1)| (_, x) <- ps]
+        n  = length ps
 
 splitOn :: Char -> String -> [String]
 splitOn c s = case dropWhile (== c) s of
@@ -74,33 +75,34 @@ splitOn c s = case dropWhile (== c) s of
   s' -> w : splitOn c s''
     where (w, s'') = break (== c) s'
 
-processor :: String -> (Int, String) -> (String, Double)
-processor text (n, s) = undefined
+getNgram :: String -> Int -> String -> [(String, Double)]
+getNgram text n w = tallyProb (gatherByNWords ws n) (words w)
+  where ws = (words . filter (\c -> isAlpha c || isSpace c) . unwords . lines) text
 
-genNgram :: String -> Int -> String -> Maybe Double
-genNgram text n = tallyProb (zip (init ws) (tail ws))
-  where ws = words text
+gatherByNWords :: [String] -> Int -> [([String], String)]
+gatherByNWords xs n = [let ys = drop i (take (i + n) xs) in (init ys, last ys) | i <- [0 .. length xs - n]]
 
 reader :: String -> (Int, String)
 reader s = (read former, latter)
     where [former, latter] = splitOn ',' s
 
-formatter :: [(String, Double)] -> String
-writer xs = intercalate ";" [printf "%s,%.3f" s prob | (s, prob) <- xs] 
+format :: [(String, Double)] -> String
+format xs = intercalate ";" [printf "%s,%.3f" s prob | (s, prob) <- ys] 
+  where ys = sortWith (\(a, b) -> (-b, a)) xs
 
-    
+
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = map reader $ lines contents
-  let text = "Manry had a little lamb its fleece was white as snow;
-And everywhere that Mary went, the lamb was sure to go. 
-It followed her to school one day, which was against the rule;
-It made the children laugh and play, to see a lamb at school.
-And so the teacher turned it out, but still it lingered near,
-And waited patiently about till Mary did appear.
-\"Why does the lamb love Mary so?\" the eager children cry;
-\"Why, Mary loves the lamb, you know\" the teacher did reply."
+  let text = "Mary had a little lamb its fleece was white as snow; \
+             \And everywhere that Mary went, the lamb was sure to go. \
+             \It followed her to school one day, which was against the rule; \
+             \It made the children laugh and play, to see a lamb at school. \
+             \And so the teacher turned it out, but still it lingered near, \
+             \And waited patiently about till Mary did appear. \
+             \ \"Why does the lamb love Mary so?\" the eager children cry; \
+             \ \"Why, Mary loves the lamb, you know\" the teacher did reply."
 
-  let outputs = map (processor text) inputs
-  mapM_ (putStrLn . formetter) outputs
+  let outputs = [getNgram text n word | (n, word) <- inputs]
+  mapM_ (putStrLn . format) outputs

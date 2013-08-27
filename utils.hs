@@ -286,3 +286,16 @@ reshapeBy n xs =
     ([], _)  -> []
     (ys,zs)  -> ys : reshapeBy n zs
 
+
+-- | unfold function
+-- From pp. 73 of Hutton "Programming in Haskell" 
+-- 
+-- use cases:
+-- map f = unfold null (f . head) tail
+-- iterate f = unfold (const True) id f
+
+unfold :: (a -> Bool) -> (a -> b) -> (a -> a) -> [b]
+unfold p h t x 
+  | p x          = []
+  |otherwise = h x : unfold p h t (t x)
+

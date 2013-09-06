@@ -21,8 +21,9 @@ The following operations should be supported with their order (operator preceden
 6   mod       Modulus divide, e.g. 5 mod 2 = 1 (only integers will be supplied here)
 7   *, /      Multiply, Divide (left-to-right precedence)
 8   +, -      Add, Subtract (left-to-right precedence)
-Input sample:
 
+Input sample
+-------------
 Your program should accept as its first argument a path to a filename. The input file contains several lines. Each line is one test case. Each line contains mathematical expression. eg.
 ```
 250*14.3
@@ -34,7 +35,7 @@ lg(10) + ln(e)
 ```
 
 Output sample
---------------
+-------------
 For each set of input produce a single line of output which is the result of calculation.
 ```
 3575
@@ -60,9 +61,22 @@ And you need to print 16 (and not 16.00000) in case the answer is 16.
 -}
 
 import System.Environment (getArgs)
-import Text.Printf (printf)
-import Data.List (isInfixOf)
-import Data.Char (isSpace)
+import Text.ParserCombinators.ReadP
+
+data Tree = Branch Tree Tree | Leaf deriving Show
+
+leaf = do char 'o'
+         return Leaf
+
+tree = leaf +++ branch
+
+branch = do 
+  a <- leaf
+  char '&'
+  b <- tree
+  return (Branch a b)
+          
+
 
 calculate :: String -> Double
 calculate = reversePolishCalc . toRPN . modifier . preModifier . splitter . filter (not . isSpace)

@@ -46,13 +46,21 @@ If you're able to solve this challenge and interested in Mashey, Flurry, New Rel
 
 import System.Environment (getArgs)
 
+type Coord = (Double, Double)
 
-traveligSalesman :: [(Double, Double)] -> [Int]
+distance :: Coord -> Coord -> Double
+ditance (x, y) (x', y')  = (x - x')^2 + (y - y')^2
+
+distanceMatrix :: [Coord] -> [[Double]]
+distanceMatrix = undefined
+
+traveligSalesman :: [Coord] -> [Int]
 traveligSalesman xs = undefined
+  where table = distanceMatrix xs
 
 ---- Haskell in CodeEval does not have `Text.Regex.Posix`
 ---- This quick implementation fails if company or street name contains parenthesis.
-reader :: String -> (Double, Double)
+reader :: String -> Coord
 reader s = read chunk
   where (_, chunk) = break (== '(')
 

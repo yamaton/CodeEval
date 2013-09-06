@@ -31,11 +31,19 @@ am so uniqe
 
 import System.Environment (getArgs)
 
+repeatedSubstring :: String -> String
+repeatedSubstring s = undefined
+
+
+
+format :: String  -> String
+format "" = "NONE"
+format s  = s
 
 main = do 
   f:_ <- getArgs
   contents <- readFile f
   let inputs = lines contents
   let outputs = map repeatedSubstring inputs
-  mapM_ putStrLn outputs
+  mapM_ (putStrLn . format) outputs
 
